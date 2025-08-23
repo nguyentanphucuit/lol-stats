@@ -7,56 +7,62 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuCheckboxItem, DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator } from '@/components/ui/dropdown-menu'
 
-interface RunesFiltersProps {
+interface DataFiltersProps {
   searchQuery: string
-  selectedStyles: string[]
-  availableStyles: string[] | undefined
+  selectedTags: string[]
+  availableTags: string[] | undefined
   onSearchChange: (value: string) => void
-  onStyleToggle: (style: string) => void
+  onTagToggle: (tag: string) => void
   onClearFilters: () => void
+  searchPlaceholder: string
+  tagLabel: string
+  description: string
 }
 
-export function RunesFilters({
+export function DataFilters({
   searchQuery,
-  selectedStyles,
-  availableStyles,
+  selectedTags,
+  availableTags,
   onSearchChange,
-  onStyleToggle,
-  onClearFilters
-}: RunesFiltersProps) {
-  const hasActiveFilters = searchQuery || selectedStyles.length > 0
-
-  const renderStylesDropdown = () => {
-    if (!availableStyles) {
+  onTagToggle,
+  onClearFilters,
+  searchPlaceholder,
+  tagLabel,
+  description
+}: DataFiltersProps) {
+  const hasActiveFilters = searchQuery || selectedTags.length > 0
+  
+  const renderTagsDropdown = () => {
+    if (!availableTags) {
       return (
         <DropdownMenuLabel className="text-gray-500">
-          Loading styles...
+          Loading tags...
         </DropdownMenuLabel>
       )
     }
-
-    if (availableStyles.length === 0) {
+    
+    if (availableTags.length === 0) {
       return (
         <DropdownMenuLabel className="text-gray-500">
-          No styles available
+          No tags available
         </DropdownMenuLabel>
       )
     }
-
-    return availableStyles.map((style) => (
+    
+    return availableTags.map((tag) => (
       <DropdownMenuCheckboxItem
-        key={style}
-        checked={selectedStyles.includes(style)}
-        onCheckedChange={() => onStyleToggle(style)}
+        key={tag}
+        checked={selectedTags.includes(tag)}
+        onCheckedChange={() => onTagToggle(tag)}
       >
-        {style}
+        {tag}
       </DropdownMenuCheckboxItem>
     ))
   }
-
+  
   const renderActiveFilters = () => {
     if (!hasActiveFilters) return null
-
+    
     return (
       <div className="flex flex-wrap gap-2">
         {searchQuery && (
@@ -70,11 +76,11 @@ export function RunesFilters({
             </button>
           </Badge>
         )}
-        {selectedStyles.map((style) => (
-          <Badge key={style} variant="secondary" className="flex items-center gap-1">
-            {style}
+        {selectedTags.map((tag) => (
+          <Badge key={tag} variant="secondary" className="flex items-center gap-1">
+            {tag}
             <button
-              onClick={() => onStyleToggle(style)}
+              onClick={() => onTagToggle(tag)}
               className="ml-1 hover:text-red-500"
             >
               <X className="h-3 w-3" />
@@ -84,13 +90,13 @@ export function RunesFilters({
       </div>
     )
   }
-
+  
   return (
     <Card className="mb-6">
       <CardHeader>
         <CardTitle>Search & Filter</CardTitle>
         <CardDescription>
-          Find runes by name or filter by their styles
+          {description}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -98,18 +104,18 @@ export function RunesFilters({
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
-              placeholder="Search runes..."
+              placeholder={searchPlaceholder}
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
               className="pl-10"
             />
           </div>
-
+          
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="flex items-center gap-2">
                 <Filter className="h-4 w-4" />
-                Styles ({selectedStyles.length})
+                {tagLabel} ({selectedTags.length})
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent 
@@ -118,9 +124,9 @@ export function RunesFilters({
               align="end"
               side="bottom"
             >
-              <DropdownMenuLabel>Filter by Styles</DropdownMenuLabel>
+              <DropdownMenuLabel>Filter by {tagLabel}</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              {renderStylesDropdown()}
+              {renderTagsDropdown()}
             </DropdownMenuContent>
           </DropdownMenu>
 

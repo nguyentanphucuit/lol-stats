@@ -1,12 +1,18 @@
 'use client'
 
-interface ItemsResultsSummaryProps {
+interface DataResultsSummaryProps {
   currentPage: number
   itemsPerPage: number
   totalItems: number
+  itemName: string
 }
 
-export function ItemsResultsSummary({ currentPage, itemsPerPage, totalItems }: ItemsResultsSummaryProps) {
+export function DataResultsSummary({ 
+  currentPage, 
+  itemsPerPage, 
+  totalItems, 
+  itemName 
+}: DataResultsSummaryProps) {
   if (totalItems === 0) return null
   
   const startItem = ((currentPage - 1) * itemsPerPage) + 1
@@ -14,7 +20,7 @@ export function ItemsResultsSummary({ currentPage, itemsPerPage, totalItems }: I
   
   return (
     <div className="mb-4 text-sm text-gray-600 dark:text-gray-300">
-      Showing {startItem} to {endItem} of {totalItems} items
+      Showing {startItem} to {endItem} of {totalItems} {itemName}
     </div>
   )
 }

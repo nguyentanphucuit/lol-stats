@@ -1,17 +1,19 @@
 'use client'
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { useState } from 'react'
-import { APP_CONFIG } from '@/lib/constants'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { useState, type ReactNode } from 'react'
 
-export function QueryProvider({ children }: { children: React.ReactNode }) {
+export function QueryProvider({ children }: { children: ReactNode }) {
   const [queryClient] = useState(
     () =>
       new QueryClient({
         defaultOptions: {
           queries: {
-            staleTime: APP_CONFIG.CHAMPIONS_CACHE_TIME,
-            gcTime: 30 * 60 * 1000, // 30 minutes - keep in memory longer
+            staleTime: 60 * 1000, // 1 minute
+            gcTime: 10 * 60 * 1000, // 10 minutes
+            retry: 1,
+            refetchOnWindowFocus: false,
           },
         },
       })
@@ -20,6 +22,7 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
       {children}
+      <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   )
 }

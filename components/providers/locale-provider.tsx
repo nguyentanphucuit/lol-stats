@@ -1,7 +1,9 @@
 'use client'
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
-import { LOCALE, LocaleValue, DEFAULT_LOCALE } from '@/lib/locales'
+import { createContext, useContext, useState, useCallback, useMemo, ReactNode } from 'react'
+import { useRouter, usePathname } from 'next/navigation'
+import { LOCALE, LocaleValue } from '@/lib/locales'
+import { getLocaleCode } from '@/lib/locale-utils'
 
 export type Locale = LocaleValue
 
@@ -13,29 +15,45 @@ interface LocaleContextType {
 
 const LocaleContext = createContext<LocaleContextType | undefined>(undefined)
 
-export function LocaleProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>(DEFAULT_LOCALE)
+interface LocaleProviderProps {
+  children: ReactNode
+  initialLocale: Locale
+}
 
-  useEffect(() => {
-    // Load saved locale from localStorage on mount
-    const savedLocale = localStorage.getItem('locale') as Locale
-    if (savedLocale && (savedLocale === LOCALE.US || savedLocale === LOCALE.VN)) {
-      setLocaleState(savedLocale)
-    }
-  }, [])
+export function LocaleProvider({ children, initialLocale }: LocaleProviderProps) {
+  const [locale, setLocaleState] = useState<Locale>(initialLocale)
+  const router = useRouter()
+  const pathname = usePathname()
 
-  const setLocale = (newLocale: Locale) => {
+  const setLocale = useCallback((newLocale: Locale) => {
+    if (newLocale === locale) return // Prevent unnecessary updates
+    
     setLocaleState(newLocale)
-    localStorage.setItem('locale', newLocale)
-  }
+    
+    // Update URL to reflect new locale
+    const currentLocaleCode = getLocaleCode(locale)
+    const newLocaleCode = getLocaleCode(newLocale)
+    
+    if (pathname && currentLocaleCode !== newLocaleCode) {
+      const newPath = pathname.replace(`/${currentLocaleCode}`, `/${newLocaleCode}`)
+      router.push(newPath)
+    }
+  }, [locale, pathname, router])
 
-  const toggleLocale = () => {
+  const toggleLocale = useCallback(() => {
     const newLocale = locale === LOCALE.US ? LOCALE.VN : LOCALE.US
     setLocale(newLocale)
-  }
+  }, [locale, setLocale])
+
+  // Memoize the context value to prevent unnecessary re-renders
+  const contextValue = useMemo(() => ({
+    locale,
+    setLocale,
+    toggleLocale
+  }), [locale, setLocale, toggleLocale])
 
   return (
-    <LocaleContext.Provider value={{ locale, setLocale, toggleLocale }}>
+    <LocaleContext.Provider value={contextValue}>
       {children}
     </LocaleContext.Provider>
   )

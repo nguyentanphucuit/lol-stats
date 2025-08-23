@@ -1,10 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
-import { Suspense } from 'react'
 import './globals.css'
-import { QueryProvider } from '@/components/providers/query-provider'
-import { LocaleProvider } from '@/components/providers/locale-provider'
-import { Navigation } from '@/components/navigation'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -21,14 +17,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <LocaleProvider>
-          <QueryProvider>
-            <Navigation />
-            <Suspense fallback={<div>Loading...</div>}>
-              {children}
-            </Suspense>
-          </QueryProvider>
-        </LocaleProvider>
+        {children}
       </body>
     </html>
   )
