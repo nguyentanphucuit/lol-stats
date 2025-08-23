@@ -10,12 +10,13 @@ import { useItems } from '@/hooks/useItems'
 import { useRunes } from '@/hooks/useRunes'
 import { useSpells } from '@/hooks/useSpells'
 import { useStatPerks } from '@/hooks/useStatPerks'
+import { useRuneTrees } from '@/hooks/useRuneTrees'
 import { DataSection } from '@/components/data-section'
 import { getTranslations } from '@/lib/translations'
 import { useLocale } from '@/components/providers/locale-provider'
 import { getLocaleCode } from '@/lib/locale-utils'
 
-type Section = 'champions' | 'items' | 'runes' | 'spells' | 'stat-perks'
+type Section = 'champions' | 'items' | 'runes' | 'spells' | 'stat-perks' | 'runes-builds'
 
 export default function DataPage() {
   const router = useRouter()
@@ -31,6 +32,7 @@ export default function DataPage() {
     if (pathname.includes('/runes')) return 'runes'
     if (pathname.includes('/spells')) return 'spells'
     if (pathname.includes('/stat-perks')) return 'stat-perks'
+    if (pathname.includes('/runes-builds')) return 'runes-builds'
     return 'champions' // default
   }
   
@@ -80,6 +82,8 @@ export default function DataPage() {
     q: params.q
   })
 
+  const { runeTrees, isLoading: runeTreesLoading, error: runeTreesError } = useRuneTrees()
+
   const handleSectionChange = (section: Section) => {
     const newPath = `/${currentLocaleCode}/data/${section}`
     router.push(newPath)
@@ -123,6 +127,13 @@ export default function DataPage() {
           isLoading: statPerksLoading,
           error: statPerksError
         }
+      case 'runes-builds':
+        return {
+          data: { runeTrees },
+          tags: [],
+          isLoading: runeTreesLoading,
+          error: runeTreesError
+        }
       default:
         return {
           data: null,
@@ -162,6 +173,8 @@ export default function DataPage() {
             : [...params.tags, tag]
           updateTags(newTags)
         }
+      case 'runes-builds':
+        return () => {} // No tag functionality for runes-builds
       default:
         return toggleTag
     }
@@ -208,6 +221,13 @@ export default function DataPage() {
               className="min-w-[120px]"
             >
               Stat Perks
+            </Button>
+            <Button
+              variant={activeSection === 'runes-builds' ? 'default' : 'outline'}
+              onClick={() => handleSectionChange('runes-builds')}
+              className="min-w-[120px]"
+            >
+              Rune Trees
             </Button>
         </div>
 

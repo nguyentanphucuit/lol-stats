@@ -28,7 +28,7 @@ export const STAT_PERKS_CONFIG = {
     {
       id: 5004,
       name: "Move Speed",
-      description: "Gain 1% Move Speed",
+      description: "Gain 2% Move Speed",
       iconUrl: "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/perk-images/statmods/statmodsmovementspeedicon.png",
       category: "Stat Shard"
     },
@@ -81,7 +81,7 @@ export const STAT_PERKS_CONFIG = {
     {
       id: 5004,
       name: "Tốc Độ Di Chuyển",
-      description: "Nhận 1% Tốc Độ Di Chuyển",
+      description: "Nhận 2% Tốc Độ Di Chuyển",
       iconUrl: "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/perk-images/statmods/statmodsmovementspeedicon.png",
       category: "Stat Shard"
     },

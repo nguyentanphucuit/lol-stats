@@ -74,7 +74,6 @@ export default function RunesBuildsPage() {
           <Card className="mb-8">
             <CardHeader className="text-center">
               <div className="flex items-center justify-between mb-4">
-                <div className="flex-1"></div>
                 <div className="flex-1 text-center">
                   <CardTitle className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
                     Rune Trees
@@ -82,14 +81,6 @@ export default function RunesBuildsPage() {
                   <p className="text-xl text-gray-600 dark:text-gray-300">
                     The 5 main rune trees with their slots and runes
                   </p>
-                </div>
-                <div className="flex-1 flex justify-end">
-                  <Link href={`/${currentLocaleCode}/runes-builds/build`}>
-                    <Button className="gap-2">
-                      <Plus className="w-4 h-4" />
-                      Build Runes
-                    </Button>
-                  </Link>
                 </div>
               </div>
             </CardHeader>
@@ -120,12 +111,7 @@ export default function RunesBuildsPage() {
                         }}
                       />
                     </div>
-                    <div>
-                      <CardTitle className="text-base">{tree.name}</CardTitle>
-                      <Badge variant="outline" className="text-xs">
-                        {tree.key}
-                      </Badge>
-                    </div>
+                    <CardTitle className="text-base">{tree.name}</CardTitle>
                   </div>
                 </CardHeader>
                 <CardContent className="pt-0">
@@ -192,20 +178,6 @@ export default function RunesBuildsPage() {
             ))}
           </div>
 
-          {/* Footer Info */}
-          <div className="mt-8 text-center">
-            <p className="text-gray-600 dark:text-gray-400">
-              Showing {runeTrees?.length || 0} rune trees with their complete structure
-            </p>
-            <div className="mt-4">
-              <Link href={`/${currentLocaleCode}/runes-builds/build`}>
-                <Button variant="outline" className="gap-2">
-                  <Settings className="w-4 h-4" />
-                  Create Custom Rune Build
-                </Button>
-              </Link>
-            </div>
-          </div>
         </div>
       </div>
     </TooltipProvider>
