@@ -1,0 +1,20 @@
+import { ENV_CONFIG } from './env'
+
+// Application constants
+export const APP_CONFIG = {
+  // Pagination
+  ITEMS_PER_PAGE: ENV_CONFIG.ITEMS_PER_PAGE,
+  MAX_ITEMS_PER_PAGE: ENV_CONFIG.MAX_ITEMS_PER_PAGE,
+  
+  // Cache settings
+  CHAMPIONS_CACHE_TIME: ENV_CONFIG.CHAMPIONS_CACHE_TIME,
+  TAGS_CACHE_TIME: ENV_CONFIG.TAGS_CACHE_TIME,
+  
+  // Image settings
+  CHAMPION_IMAGE_SIZE: ENV_CONFIG.CHAMPION_IMAGE_SIZE,
+  
+  // Pagination display
+  MAX_VISIBLE_PAGES: ENV_CONFIG.MAX_VISIBLE_PAGES
+} as const
+
+
