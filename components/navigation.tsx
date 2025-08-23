@@ -23,6 +23,8 @@ export function Navigation() {
   const navItems = useMemo(() => [
     { href: getLocaleUrl('/', currentLocaleCode), label: translations.navigation.home },
     { href: getLocaleUrl('/data', currentLocaleCode), label: 'Data' },
+    { href: getLocaleUrl('/urf', currentLocaleCode), label: 'URF' },
+    { href: getLocaleUrl('/runes-builds', currentLocaleCode), label: 'Runes Builds' },
   ], [currentLocaleCode, translations])
 
   return (

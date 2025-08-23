@@ -11,7 +11,7 @@ import { ItemsTable } from '@/components/items/items-table'
 import { RunesTable } from '@/components/runes/runes-table'
 import { SpellsTable } from '@/components/spells/spells-table'
 
-type Section = 'champions' | 'items' | 'runes' | 'spells'
+type Section = 'champions' | 'items' | 'runes' | 'spells' | 'stat-perks'
 
 interface DataSectionProps {
   section: Section
@@ -51,7 +51,8 @@ export function DataSection({
       champions: 'Failed to load champions. Please try again later.',
       items: 'Failed to load items. Please try again later.',
       runes: 'Failed to load runes. Please try again later.',
-      spells: 'Failed to load spells. Please try again later.'
+      spells: 'Failed to load spells. Please try again later.',
+      'stat-perks': 'Failed to load stat perks. Please try again later.'
     }
     
     return (
@@ -79,6 +80,10 @@ export function DataSection({
       spells: {
         title: 'Spells',
         description: 'Learn about spells and how to use them'
+      },
+      'stat-perks': {
+        title: 'Stat Perks',
+        description: 'Choose bonus stats to customize your champion'
       }
     }
 
@@ -107,6 +112,11 @@ export function DataSection({
         searchPlaceholder: 'Search spells...',
         tagLabel: 'Modes',
         description: 'Find spells by name or filter by their game modes'
+      },
+      'stat-perks': {
+        searchPlaceholder: 'Search stat perks...',
+        tagLabel: 'Categories',
+        description: 'Find stat perks by name or filter by their categories'
       }
     }
 
@@ -134,7 +144,8 @@ export function DataSection({
       champions: 'champions',
       items: 'items',
       runes: 'runes',
-      spells: 'spells'
+      spells: 'spells',
+      'stat-perks': 'stat perks'
     }
 
     return (
@@ -182,6 +193,12 @@ export function DataSection({
             isLoading={isLoading}
             spellsPerPage={itemsPerPage}
           />
+        )
+      case 'stat-perks':
+        return (
+          <div className="p-6 text-center text-gray-500">
+            Stat perks table component will be implemented here
+          </div>
         )
       default: return null
     }

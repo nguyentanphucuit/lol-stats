@@ -15,11 +15,6 @@ export const LEAGUE_CONFIG = {
   // Default locale
   LOCAL,
   
-  // Champion data endpoint
-  getChampionDataUrl: (locale: string = LOCAL) => {
-    return `${LEAGUE_CONFIG.DDRAGON_BASE_URL}/${LEAGUE_CONFIG.PATCH}/data/${locale}/champion.json`
-  },
-  
   // Champion image endpoint
   get CHAMPION_IMAGE_URL() {
     return `${this.DDRAGON_BASE_URL}/${this.PATCH}/img/champion`
@@ -30,19 +25,9 @@ export const LEAGUE_CONFIG = {
     return `${this.DDRAGON_BASE_URL}/${this.PATCH}/img/sprite`
   },
   
-  // Items data endpoint
-  getItemsDataUrl: (locale: string = LOCAL) => {
-    return `${LEAGUE_CONFIG.DDRAGON_BASE_URL}/${LEAGUE_CONFIG.PATCH}/data/${locale}/item.json`
-  },
-  
   // Items image endpoint
   get ITEMS_IMAGE_URL() {
     return `${this.DDRAGON_BASE_URL}/${this.PATCH}/img/item`
-  },
-
-  // Runes data endpoint
-  getRunesDataUrl: (locale: string = LOCAL) => {
-    return `${LEAGUE_CONFIG.DDRAGON_BASE_URL}/${LEAGUE_CONFIG.PATCH}/data/${locale}/runesReforged.json`
   },
 
   // Runes image endpoint
@@ -50,13 +35,33 @@ export const LEAGUE_CONFIG = {
     return `${this.DDRAGON_BASE_URL}/img`
   },
 
-  // Summoner spells data endpoint
-  getSummonerSpellsDataUrl: (locale: string = LOCAL) => {
-    return `${LEAGUE_CONFIG.DDRAGON_BASE_URL}/${LEAGUE_CONFIG.PATCH}/data/${locale}/summoner.json`
-  },
-
   // Summoner spells image endpoint
   get SUMMONER_SPELLS_IMAGE_URL() {
     return `${this.DDRAGON_BASE_URL}/${this.PATCH}/img/spell`
+  },
+
+  // Stat perks image endpoint
+  get STAT_PERKS_IMAGE_URL() {
+    return `${this.DDRAGON_BASE_URL}/img`
   }
 } as const
+
+// Separate functions that use the config
+export const getChampionDataUrl = (locale: string = LOCAL) => {
+  return `${LEAGUE_CONFIG.DDRAGON_BASE_URL}/${LEAGUE_CONFIG.PATCH}/data/${locale}/champion.json`
+}
+
+export const getItemsDataUrl = (locale: string = LOCAL) => {
+  return `${LEAGUE_CONFIG.DDRAGON_BASE_URL}/${LEAGUE_CONFIG.PATCH}/data/${locale}/item.json`
+}
+
+export const getRunesDataUrl = (locale: string = LOCAL) => {
+  return `${LEAGUE_CONFIG.DDRAGON_BASE_URL}/${LEAGUE_CONFIG.PATCH}/data/${locale}/runesReforged.json`
+}
+
+export const getSummonerSpellsDataUrl = (locale: string = LOCAL) => {
+  return `${LEAGUE_CONFIG.DDRAGON_BASE_URL}/${LEAGUE_CONFIG.PATCH}/data/${locale}/summoner.json`
+}
+
+// Note: Stat perks are not available in Data Dragon API
+// They are managed through local configuration in stat-perks-config.ts

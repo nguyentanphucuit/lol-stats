@@ -32,6 +32,41 @@ export interface ChampionsQueryParams {
   limit?: number
 }
 
+export interface StatPerk {
+  id: string
+  key: string
+  name: string
+  description: string
+  icon: string
+  category: string
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface StatPerksResponse {
+  statPerks: StatPerk[]
+  total: number
+  page: number
+  limit: number
+  totalPages: number
+}
+
+export interface StatPerksQueryParams {
+  q?: string
+  category?: string
+  page?: number
+  limit?: number
+}
+
+// Stat Shard interface
+export interface StatShard {
+  id: number
+  name: string
+  description: string
+  iconUrl: string
+  category: string
+}
+
 export interface Item {
   id: string
   name: string
@@ -134,6 +169,29 @@ export interface RunesQueryParams {
   styles?: string[]
   page?: number
   limit?: number
+}
+
+// Rune Tree interfaces for the complete structure
+export interface RuneTreeRune {
+  id: number
+  key: string
+  icon: string
+  name: string
+  shortDesc: string
+  longDesc: string
+}
+
+export interface RuneTreeSlot {
+  name: string
+  runes: RuneTreeRune[]
+}
+
+export interface RuneTree {
+  id: number
+  key: string
+  icon: string
+  name: string
+  slots: RuneTreeSlot[]
 }
 
 export interface Spell {

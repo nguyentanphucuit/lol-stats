@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { LEAGUE_CONFIG } from '@/lib/league-config'
+import { getRunesDataUrl } from '@/lib/league-config'
 import { DEFAULT_LOCALE } from '@/lib/locales'
 
 export async function GET(request: NextRequest) {
@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
     const locale = searchParams.get('locale') || DEFAULT_LOCALE
     
     // Fetch runes data from DDragon API to extract styles with specified locale
-    const response = await fetch(LEAGUE_CONFIG.getRunesDataUrl(locale))
+    const response = await fetch(getRunesDataUrl(locale))
 
     if (!response.ok) {
       throw new Error(`Failed to fetch runes: ${response.status}`)

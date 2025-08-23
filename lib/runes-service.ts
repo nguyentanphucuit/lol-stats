@@ -1,5 +1,6 @@
 import { LEAGUE_CONFIG } from './league-config'
 import { APP_CONFIG } from './constants'
+import { RuneTree } from '@/types'
 
 // Runes service functions
 export const runesService = {
@@ -59,6 +60,20 @@ export const runesService = {
     const response = await fetch(`/api/runes/styles?${queryParams.toString()}`)
     if (!response.ok) {
       throw new Error('Failed to fetch styles')
+    }
+    return response.json()
+  },
+
+  // Get rune trees (complete structure)
+  getRuneTrees: async (locale?: string): Promise<RuneTree[]> => {
+    const queryParams = new URLSearchParams()
+    if (locale) {
+      queryParams.append('locale', locale)
+    }
+    
+    const response = await fetch(`/api/runes/trees?${queryParams.toString()}`)
+    if (!response.ok) {
+      throw new Error('Failed to fetch rune trees')
     }
     return response.json()
   }

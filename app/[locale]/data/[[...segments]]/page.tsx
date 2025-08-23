@@ -9,12 +9,13 @@ import { useChampions } from '@/hooks/useChampions'
 import { useItems } from '@/hooks/useItems'
 import { useRunes } from '@/hooks/useRunes'
 import { useSpells } from '@/hooks/useSpells'
+import { useStatPerks } from '@/hooks/useStatPerks'
 import { DataSection } from '@/components/data-section'
 import { getTranslations } from '@/lib/translations'
 import { useLocale } from '@/components/providers/locale-provider'
 import { getLocaleCode } from '@/lib/locale-utils'
 
-type Section = 'champions' | 'items' | 'runes' | 'spells'
+type Section = 'champions' | 'items' | 'runes' | 'spells' | 'stat-perks'
 
 export default function DataPage() {
   const router = useRouter()
@@ -29,6 +30,7 @@ export default function DataPage() {
     if (pathname.includes('/items')) return 'items'
     if (pathname.includes('/runes')) return 'runes'
     if (pathname.includes('/spells')) return 'spells'
+    if (pathname.includes('/stat-perks')) return 'stat-perks'
     return 'champions' // default
   }
   
@@ -72,6 +74,12 @@ export default function DataPage() {
     modes: params.tags
   })
 
+  const { statPerks, categories, isLoading: statPerksLoading, error: statPerksError } = useStatPerks({
+    page: params.page,
+    limit: params.limit,
+    q: params.q
+  })
+
   const handleSectionChange = (section: Section) => {
     const newPath = `/${currentLocaleCode}/data/${section}`
     router.push(newPath)
@@ -108,6 +116,13 @@ export default function DataPage() {
           isLoading: spellsLoading,
           error: spellsError
         }
+      case 'stat-perks':
+        return {
+          data: statPerks,
+          tags: categories || [],
+          isLoading: statPerksLoading,
+          error: statPerksError
+        }
       default:
         return {
           data: null,
@@ -134,6 +149,13 @@ export default function DataPage() {
           updateTags(newTags)
         }
       case 'spells':
+        return (tag: string) => {
+          const newTags = params.tags.includes(tag) 
+            ? params.tags.filter(t => t !== tag) 
+            : [...params.tags, tag]
+          updateTags(newTags)
+        }
+      case 'stat-perks':
         return (tag: string) => {
           const newTags = params.tags.includes(tag) 
             ? params.tags.filter(t => t !== tag) 
@@ -179,6 +201,13 @@ export default function DataPage() {
               className="min-w-[120px]"
             >
               {translations.navigation?.spells || 'Spells'}
+            </Button>
+            <Button
+              variant={activeSection === 'stat-perks' ? 'default' : 'outline'}
+              onClick={() => handleSectionChange('stat-perks')}
+              className="min-w-[120px]"
+            >
+              Stat Perks
             </Button>
         </div>
 

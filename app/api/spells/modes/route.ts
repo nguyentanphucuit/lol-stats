@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { LEAGUE_CONFIG } from '@/lib/league-config'
+import { getSummonerSpellsDataUrl } from '@/lib/league-config'
 import { DEFAULT_LOCALE } from '@/lib/locales'
 
 export async function GET(request: NextRequest) {
@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const locale = searchParams.get('locale') || DEFAULT_LOCALE
     
-    const response = await fetch(LEAGUE_CONFIG.getSummonerSpellsDataUrl(locale))
+    const response = await fetch(getSummonerSpellsDataUrl(locale))
     if (!response.ok) {
       throw new Error(`Failed to fetch spells: ${response.status}`)
     }

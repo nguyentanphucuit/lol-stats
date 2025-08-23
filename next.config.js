@@ -9,6 +9,12 @@ const nextConfig = {
         port: '',
         pathname: '/cdn/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'raw.communitydragon.org',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
 }

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { LEAGUE_CONFIG } from '@/lib/league-config'
+import { getChampionDataUrl } from '@/lib/league-config'
 import { DEFAULT_LOCALE } from '@/lib/locales'
 
 export async function GET(request: NextRequest) {
@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
     const locale = searchParams.get('locale') || DEFAULT_LOCALE
     
     // Fetch champions data from DDragon API to extract tags with specified locale
-    const response = await fetch(LEAGUE_CONFIG.getChampionDataUrl(locale))
+    const response = await fetch(getChampionDataUrl(locale))
     
     if (!response.ok) {
       throw new Error(`Failed to fetch champions: ${response.status}`)
