@@ -6,7 +6,8 @@ const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'League of Legends Champions',
-  description: 'Browse and search League of Legends champions with detailed information',
+  description:
+    'Browse and search League of Legends champions with detailed information',
 }
 
 export default function RootLayout({
@@ -16,9 +17,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        {children}
-      </body>
+      <body className={inter.className}>{children}</body>
     </html>
   )
 }

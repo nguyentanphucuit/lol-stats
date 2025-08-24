@@ -12,7 +12,7 @@ interface UseItemsParams {
 
 export function useItems(params: UseItemsParams) {
   const { locale } = useLocale()
-  
+
   const itemsQuery = useQuery({
     queryKey: ['items', locale, params.q, params.tags, params.page],
     queryFn: async () => {
@@ -21,7 +21,7 @@ export function useItems(params: UseItemsParams) {
         limit: params.limit,
         q: params.q,
         tags: params.tags,
-        locale
+        locale,
       })
     },
     staleTime: APP_CONFIG.CHAMPIONS_CACHE_TIME,

@@ -56,7 +56,7 @@ export const runesService = {
     if (locale) {
       queryParams.append('locale', locale)
     }
-    
+
     const response = await fetch(`/api/runes/styles?${queryParams.toString()}`)
     if (!response.ok) {
       throw new Error('Failed to fetch styles')
@@ -70,11 +70,11 @@ export const runesService = {
     if (locale) {
       queryParams.append('locale', locale)
     }
-    
+
     const response = await fetch(`/api/runes/trees?${queryParams.toString()}`)
     if (!response.ok) {
       throw new Error('Failed to fetch rune trees')
     }
     return response.json()
-  }
+  },
 }

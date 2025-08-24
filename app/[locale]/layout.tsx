@@ -7,14 +7,20 @@ import { Navigation } from '@/components/navigation'
 import { LOCALE, LocaleValue } from '@/lib/locales'
 import { getLocaleFromCode } from '@/lib/locale-utils'
 
-export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}): Promise<Metadata> {
   const { locale } = await params
   const localeValue = getLocaleFromCode(locale as 'en' | 'vi')
   const isVietnamese = localeValue === LOCALE.VN
-  
+
   return {
-    title: isVietnamese ? 'League of Legends Champions' : 'League of Legends Champions',
-    description: isVietnamese 
+    title: isVietnamese
+      ? 'League of Legends Champions'
+      : 'League of Legends Champions',
+    description: isVietnamese
       ? 'Browse and search League of Legends champions with detailed information'
       : 'Browse and search League of Legends champions with detailed information',
   }

@@ -6,7 +6,7 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const locale = searchParams.get('locale') || DEFAULT_LOCALE
-    
+
     const response = await fetch(getSummonerSpellsDataUrl(locale))
     if (!response.ok) {
       throw new Error(`Failed to fetch spells: ${response.status}`)
@@ -14,7 +14,9 @@ export async function GET(request: NextRequest) {
     const data = await response.json()
 
     // Extract all unique modes from all spells
-    const allModes = Object.values(data.data).flatMap((spell: any) => spell.modes)
+    const allModes = Object.values(data.data).flatMap(
+      (spell: any) => spell.modes
+    )
     const uniqueModes = [...new Set(allModes)].sort()
 
     return NextResponse.json(uniqueModes)

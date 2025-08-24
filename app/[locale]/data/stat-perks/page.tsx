@@ -17,14 +17,14 @@ export default function StatPerksPage() {
   const { locale } = useLocale()
   const currentLocaleCode = getLocaleCode(locale)
   const translations = getTranslations(locale)
-  
+
   const params = useParams()
   const [selectedCategory, setSelectedCategory] = useState<string>('')
 
   const { statPerks, categories, isLoading, error } = useStatPerks({
     page: params.params.page,
     limit: params.params.limit,
-    q: params.params.q
+    q: params.params.q,
   })
 
   const handleSearchChange = (value: string) => {
@@ -65,11 +65,11 @@ export default function StatPerksPage() {
                 <Input
                   placeholder="Search stat perks..."
                   value={params.params.q}
-                  onChange={(e) => handleSearchChange(e.target.value)}
+                  onChange={e => handleSearchChange(e.target.value)}
                   className="w-full"
                 />
               </div>
-              
+
               {/* Category Filter */}
               <div className="flex gap-2">
                 <Button
@@ -79,10 +79,12 @@ export default function StatPerksPage() {
                 >
                   All Categories
                 </Button>
-                {categories?.map((category) => (
+                {categories?.map(category => (
                   <Button
                     key={category}
-                    variant={selectedCategory === category ? 'default' : 'outline'}
+                    variant={
+                      selectedCategory === category ? 'default' : 'outline'
+                    }
                     onClick={() => handleCategoryChange(category)}
                     size="sm"
                   >
@@ -90,13 +92,9 @@ export default function StatPerksPage() {
                   </Button>
                 ))}
               </div>
-              
+
               {/* Clear Filters */}
-              <Button
-                variant="outline"
-                onClick={clearFilters}
-                size="sm"
-              >
+              <Button variant="outline" onClick={clearFilters} size="sm">
                 Clear
               </Button>
             </div>
@@ -107,7 +105,8 @@ export default function StatPerksPage() {
         {statPerks && (
           <div className="mb-6 text-center">
             <p className="text-gray-600 dark:text-gray-400">
-              Showing {statPerks.statPerks.length} of {statPerks.total} stat perks
+              Showing {statPerks.statPerks.length} of {statPerks.total} stat
+              perks
               {selectedCategory && ` in category "${selectedCategory}"`}
             </p>
           </div>
@@ -148,18 +147,19 @@ export default function StatPerksPage() {
                         width={48}
                         height={48}
                         className="rounded-lg object-cover"
-                        onError={(e) => {
+                        onError={e => {
                           // Fallback to placeholder if CDragon image fails
                           const target = e.currentTarget as HTMLImageElement
                           target.style.display = 'none'
                           const parent = target.parentElement
                           if (parent) {
-                            parent.innerHTML = '<div class="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center"><span class="text-2xl">⚡</span></div>'
+                            parent.innerHTML =
+                              '<div class="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center"><span class="text-2xl">⚡</span></div>'
                           }
                         }}
                       />
                     </div>
-                    
+
                     {/* Content */}
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
@@ -193,11 +193,11 @@ export default function StatPerksPage() {
               >
                 Previous
               </Button>
-              
+
               <span className="flex items-center px-4 text-sm text-gray-600 dark:text-gray-400">
                 Page {params.params.page} of {statPerks.totalPages}
               </span>
-              
+
               <Button
                 variant="outline"
                 onClick={() => params.updatePage(params.params.page + 1)}

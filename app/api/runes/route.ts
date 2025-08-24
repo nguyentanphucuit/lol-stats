@@ -9,7 +9,12 @@ export async function GET(request: NextRequest) {
 
     // Parse query parameters
     const page = parseInt(searchParams.get('page') || '1')
-    const limit = Math.min(parseInt(searchParams.get('limit') || APP_CONFIG.ITEMS_PER_PAGE.toString()), APP_CONFIG.MAX_ITEMS_PER_PAGE)
+    const limit = Math.min(
+      parseInt(
+        searchParams.get('limit') || APP_CONFIG.ITEMS_PER_PAGE.toString()
+      ),
+      APP_CONFIG.MAX_ITEMS_PER_PAGE
+    )
     const searchQuery = searchParams.get('q') || ''
     const styles = searchParams.getAll('styles')
     const locale = searchParams.get('locale') || DEFAULT_LOCALE
@@ -36,7 +41,7 @@ export async function GET(request: NextRequest) {
           style: style.name,
           styleKey: style.key,
           createdAt: new Date(),
-          updatedAt: new Date()
+          updatedAt: new Date(),
         }))
       )
     )
@@ -45,10 +50,11 @@ export async function GET(request: NextRequest) {
     let filteredRunes = allRunes
 
     if (searchQuery) {
-      filteredRunes = filteredRunes.filter((rune: any) =>
-        rune.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        rune.shortDesc.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        rune.style.toLowerCase().includes(searchQuery.toLowerCase())
+      filteredRunes = filteredRunes.filter(
+        (rune: any) =>
+          rune.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          rune.shortDesc.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          rune.style.toLowerCase().includes(searchQuery.toLowerCase())
       )
     }
 
@@ -71,15 +77,14 @@ export async function GET(request: NextRequest) {
       total,
       page,
       limit,
-      totalPages
+      totalPages,
     })
-
   } catch (error) {
     console.error('Error fetching runes:', error)
     return NextResponse.json(
       {
         error: 'Failed to fetch runes',
-        details: error instanceof Error ? error.message : 'Unknown error'
+        details: error instanceof Error ? error.message : 'Unknown error',
       },
       { status: 500 }
     )

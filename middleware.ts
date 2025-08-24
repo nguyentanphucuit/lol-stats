@@ -11,10 +11,10 @@ const validLocaleCodes = Object.values(LOCALE_CODES)
 function getLocale(request: NextRequest): string {
   // Check if there's a locale in the URL path
   const pathname = request.nextUrl.pathname
-  const pathnameLocale = locales.find(
-    (locale) => pathname.startsWith(`/${getLocaleCode(locale)}`)
+  const pathnameLocale = locales.find(locale =>
+    pathname.startsWith(`/${getLocaleCode(locale)}`)
   )
-  
+
   if (pathnameLocale) {
     return pathnameLocale
   }
@@ -24,13 +24,13 @@ function getLocale(request: NextRequest): string {
   if (acceptLanguage) {
     const preferredLocale = acceptLanguage
       .split(',')
-      .map((lang) => lang.split(';')[0].trim())
-      .find((lang) => {
+      .map(lang => lang.split(';')[0].trim())
+      .find(lang => {
         if (lang.startsWith('vi')) return LOCALE.VN
         if (lang.startsWith('en')) return LOCALE.US
         return false
       })
-    
+
     if (preferredLocale) {
       return preferredLocale.startsWith('vi') ? LOCALE.VN : LOCALE.US
     }
@@ -41,7 +41,7 @@ function getLocale(request: NextRequest): string {
 
 export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname
-  
+
   // Check if the pathname has a locale prefix
   if (hasLocalePrefix(pathname)) {
     // Validate that the locale code is correct
@@ -56,18 +56,14 @@ export function middleware(request: NextRequest) {
   // Redirect to the proper locale path
   const locale = getLocale(request)
   const localeCode = getLocaleCode(locale)
-  
+
   // Handle root path specially
   if (pathname === '/') {
-    return NextResponse.redirect(
-      new URL(`/${localeCode}`, request.url)
-    )
+    return NextResponse.redirect(new URL(`/${localeCode}`, request.url))
   }
 
   // For invalid paths, redirect to the root of the proper locale
-  return NextResponse.redirect(
-    new URL(`/${localeCode}`, request.url)
-  )
+  return NextResponse.redirect(new URL(`/${localeCode}`, request.url))
 }
 
 export const config = {

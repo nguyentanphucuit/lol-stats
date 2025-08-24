@@ -28,11 +28,11 @@ export const itemsService = {
       page: params.page.toString(),
       limit: safeLimit.toString(),
     })
-    
+
     if (params.q) {
       queryParams.append('q', params.q)
     }
-    
+
     if (params.tags && params.tags.length > 0) {
       params.tags.forEach(tag => queryParams.append('tags', tag))
     }
@@ -54,11 +54,11 @@ export const itemsService = {
     if (locale) {
       queryParams.append('locale', locale)
     }
-    
+
     const response = await fetch(`/api/items/tags?${queryParams.toString()}`)
     if (!response.ok) {
       throw new Error('Failed to fetch tags')
     }
     return response.json()
-  }
+  },
 }

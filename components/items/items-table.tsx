@@ -1,7 +1,14 @@
 'use client'
 
 import Image from 'next/image'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Badge } from '@/components/ui/badge'
 import { Item } from '@/types'
@@ -14,15 +21,21 @@ interface ItemsTableProps {
   itemsPerPage: number
 }
 
-export function ItemsTable({ items, isLoading, itemsPerPage }: ItemsTableProps) {
+export function ItemsTable({
+  items,
+  isLoading,
+  itemsPerPage,
+}: ItemsTableProps) {
   const renderLoadingSkeletons = () => {
     const imageSize = APP_CONFIG.CHAMPION_IMAGE_SIZE
-    const imageSizeClass = `w-${imageSize/4} h-${imageSize/4}`
-    
+    const imageSizeClass = `w-${imageSize / 4} h-${imageSize / 4}`
+
     return Array.from({ length: itemsPerPage }).map((_, i) => (
       <TableRow key={`items-skeleton-${i}`}>
         <TableCell>
-          <div className={`${imageSizeClass} rounded-md bg-gray-200 dark:bg-gray-700 flex items-center justify-center`}>
+          <div
+            className={`${imageSizeClass} rounded-md bg-gray-200 dark:bg-gray-700 flex items-center justify-center`}
+          >
             <Skeleton className={`${imageSizeClass} rounded-md`} />
           </div>
         </TableCell>
@@ -47,7 +60,7 @@ export function ItemsTable({ items, isLoading, itemsPerPage }: ItemsTableProps) 
       </TableRow>
     ))
   }
-  
+
   const renderEmptyState = () => (
     <TableRow>
       <TableCell colSpan={6} className="text-center py-8">
@@ -58,9 +71,7 @@ export function ItemsTable({ items, isLoading, itemsPerPage }: ItemsTableProps) 
       </TableCell>
     </TableRow>
   )
-  
 
-  
   if (isLoading) {
     return (
       <Table>
@@ -74,13 +85,11 @@ export function ItemsTable({ items, isLoading, itemsPerPage }: ItemsTableProps) 
             <TableHead>Tags</TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody>
-          {renderLoadingSkeletons()}
-        </TableBody>
+        <TableBody>{renderLoadingSkeletons()}</TableBody>
       </Table>
     )
   }
-  
+
   if (!items || items.length === 0) {
     return (
       <Table>
@@ -94,17 +103,13 @@ export function ItemsTable({ items, isLoading, itemsPerPage }: ItemsTableProps) 
             <TableHead>Tags</TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody>
-          {renderEmptyState()}
-        </TableBody>
+        <TableBody>{renderEmptyState()}</TableBody>
       </Table>
     )
   }
-  
+
   const imageSize = APP_CONFIG.CHAMPION_IMAGE_SIZE
-  const imageSizeClass = `w-${imageSize/4} h-${imageSize/4}`
-
-
+  const imageSizeClass = `w-${imageSize / 4} h-${imageSize / 4}`
 
   return (
     <Table>
@@ -122,14 +127,16 @@ export function ItemsTable({ items, isLoading, itemsPerPage }: ItemsTableProps) 
         {items?.map((item, index) => (
           <TableRow key={item?.id || `item-${index}`}>
             <TableCell>
-              <div className={`${imageSizeClass} rounded-md bg-gray-200 dark:bg-gray-700 flex items-center justify-center`}>
-                <Image 
+              <div
+                className={`${imageSizeClass} rounded-md bg-gray-200 dark:bg-gray-700 flex items-center justify-center`}
+              >
+                <Image
                   src={itemsService.getItemImageUrl(item.image)}
                   alt={`${item.name} icon`}
                   width={imageSize}
                   height={imageSize}
                   className="rounded-md object-cover"
-                  onError={(e) => {
+                  onError={e => {
                     console.error('Image failed to load:', item.image, e)
                     // Show initials when image fails to load
                     const target = e.currentTarget as HTMLImageElement
@@ -166,7 +173,11 @@ export function ItemsTable({ items, isLoading, itemsPerPage }: ItemsTableProps) 
             <TableCell>
               <div className="flex flex-wrap gap-1">
                 {item.tags.map((tag, tagIndex) => (
-                  <Badge key={tag || `tag-${tagIndex}`} variant="outline" className="text-xs">
+                  <Badge
+                    key={tag || `tag-${tagIndex}`}
+                    variant="outline"
+                    className="text-xs"
+                  >
                     {tag}
                   </Badge>
                 ))}

@@ -1,7 +1,14 @@
 'use client'
 
 import Image from 'next/image'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Badge } from '@/components/ui/badge'
 import { Rune } from '@/types'
@@ -14,15 +21,21 @@ interface RunesTableProps {
   runesPerPage: number
 }
 
-export function RunesTable({ runes, isLoading, runesPerPage }: RunesTableProps) {
+export function RunesTable({
+  runes,
+  isLoading,
+  runesPerPage,
+}: RunesTableProps) {
   const renderLoadingSkeletons = () => {
     const imageSize = APP_CONFIG.CHAMPION_IMAGE_SIZE
-    const imageSizeClass = `w-${imageSize/4} h-${imageSize/4}`
+    const imageSizeClass = `w-${imageSize / 4} h-${imageSize / 4}`
 
     return Array.from({ length: runesPerPage }).map((_, i) => (
       <TableRow key={`runes-skeleton-${i}`}>
         <TableCell>
-          <div className={`${imageSizeClass} rounded-md bg-gray-200 dark:bg-gray-700 flex items-center justify-center`}>
+          <div
+            className={`${imageSizeClass} rounded-md bg-gray-200 dark:bg-gray-700 flex items-center justify-center`}
+          >
             <Skeleton className={`${imageSizeClass} rounded-md`} />
           </div>
         </TableCell>
@@ -68,9 +81,7 @@ export function RunesTable({ runes, isLoading, runesPerPage }: RunesTableProps) 
             <TableHead>Tags</TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody>
-          {renderLoadingSkeletons()}
-        </TableBody>
+        <TableBody>{renderLoadingSkeletons()}</TableBody>
       </Table>
     )
   }
@@ -87,15 +98,13 @@ export function RunesTable({ runes, isLoading, runesPerPage }: RunesTableProps) 
             <TableHead>Tags</TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody>
-          {renderEmptyState()}
-        </TableBody>
+        <TableBody>{renderEmptyState()}</TableBody>
       </Table>
     )
   }
 
   const imageSize = APP_CONFIG.CHAMPION_IMAGE_SIZE
-  const imageSizeClass = `w-${imageSize/4} h-${imageSize/4}`
+  const imageSizeClass = `w-${imageSize / 4} h-${imageSize / 4}`
 
   return (
     <Table>
@@ -112,14 +121,16 @@ export function RunesTable({ runes, isLoading, runesPerPage }: RunesTableProps) 
         {runes?.map((rune, index) => (
           <TableRow key={rune?.id || `rune-${index}`}>
             <TableCell>
-              <div className={`${imageSizeClass} rounded-md bg-gray-200 dark:bg-gray-700 flex items-center justify-center`}>
+              <div
+                className={`${imageSizeClass} rounded-md bg-gray-200 dark:bg-gray-700 flex items-center justify-center`}
+              >
                 <Image
                   src={runesService.getRuneImageUrl(rune.icon)}
                   alt={`${rune.name} icon`}
                   width={imageSize}
                   height={imageSize}
                   className="rounded-md object-cover"
-                  onError={(e) => {
+                  onError={e => {
                     console.error('Image failed to load:', rune.icon, e)
                     // Show initials when image fails to load
                     const target = e.currentTarget as HTMLImageElement
@@ -146,7 +157,11 @@ export function RunesTable({ runes, isLoading, runesPerPage }: RunesTableProps) 
             </TableCell>
             <TableCell>
               <div className="flex flex-wrap gap-1">
-                <Badge key={`rune-${rune.id}`} variant="secondary" className="text-xs">
+                <Badge
+                  key={`rune-${rune.id}`}
+                  variant="secondary"
+                  className="text-xs"
+                >
                   {rune.key}
                 </Badge>
               </div>

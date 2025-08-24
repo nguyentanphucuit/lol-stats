@@ -15,7 +15,7 @@ export const statPerksService = {
       page: params.page.toString(),
       limit: safeLimit.toString(),
     })
-    
+
     if (params.q) {
       queryParams.append('q', params.q)
     }
@@ -37,11 +37,13 @@ export const statPerksService = {
     if (locale) {
       queryParams.append('locale', locale)
     }
-    
-    const response = await fetch(`/api/stat-perks/categories?${queryParams.toString()}`)
+
+    const response = await fetch(
+      `/api/stat-perks/categories?${queryParams.toString()}`
+    )
     if (!response.ok) {
       throw new Error('Failed to fetch stat perks categories')
     }
     return response.json()
-  }
+  },
 }

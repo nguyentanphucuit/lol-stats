@@ -4,8 +4,21 @@ import { Search, Filter, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuCheckboxItem, DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator } from '@/components/ui/dropdown-menu'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuCheckboxItem,
+  DropdownMenuTrigger,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from '@/components/ui/dropdown-menu'
 
 interface DataFiltersProps {
   searchQuery: string
@@ -28,10 +41,10 @@ export function DataFilters({
   onClearFilters,
   searchPlaceholder,
   tagLabel,
-  description
+  description,
 }: DataFiltersProps) {
   const hasActiveFilters = searchQuery || selectedTags.length > 0
-  
+
   const renderTagsDropdown = () => {
     if (!availableTags) {
       return (
@@ -40,7 +53,7 @@ export function DataFilters({
         </DropdownMenuLabel>
       )
     }
-    
+
     if (availableTags.length === 0) {
       return (
         <DropdownMenuLabel className="text-gray-500">
@@ -48,8 +61,8 @@ export function DataFilters({
         </DropdownMenuLabel>
       )
     }
-    
-    return availableTags.map((tag) => (
+
+    return availableTags.map(tag => (
       <DropdownMenuCheckboxItem
         key={tag}
         checked={selectedTags.includes(tag)}
@@ -59,10 +72,10 @@ export function DataFilters({
       </DropdownMenuCheckboxItem>
     ))
   }
-  
+
   const renderActiveFilters = () => {
     if (!hasActiveFilters) return null
-    
+
     return (
       <div className="flex flex-wrap gap-2">
         {searchQuery && (
@@ -76,8 +89,12 @@ export function DataFilters({
             </button>
           </Badge>
         )}
-        {selectedTags.map((tag) => (
-          <Badge key={tag} variant="secondary" className="flex items-center gap-1">
+        {selectedTags.map(tag => (
+          <Badge
+            key={tag}
+            variant="secondary"
+            className="flex items-center gap-1"
+          >
             {tag}
             <button
               onClick={() => onTagToggle(tag)}
@@ -90,14 +107,12 @@ export function DataFilters({
       </div>
     )
   }
-  
+
   return (
     <Card className="mb-6">
       <CardHeader>
         <CardTitle>Search & Filter</CardTitle>
-        <CardDescription>
-          {description}
-        </CardDescription>
+        <CardDescription>{description}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex flex-col sm:flex-row gap-4">
@@ -106,11 +121,11 @@ export function DataFilters({
             <Input
               placeholder={searchPlaceholder}
               value={searchQuery}
-              onChange={(e) => onSearchChange(e.target.value)}
+              onChange={e => onSearchChange(e.target.value)}
               className="pl-10"
             />
           </div>
-          
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="flex items-center gap-2">
@@ -118,8 +133,8 @@ export function DataFilters({
                 {tagLabel} ({selectedTags.length})
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent 
-              className="w-56 max-h-80 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-800" 
+            <DropdownMenuContent
+              className="w-56 max-h-80 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-800"
               sideOffset={8}
               align="end"
               side="bottom"
@@ -131,7 +146,11 @@ export function DataFilters({
           </DropdownMenu>
 
           {hasActiveFilters && (
-            <Button variant="ghost" onClick={onClearFilters} className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              onClick={onClearFilters}
+              className="flex items-center gap-2"
+            >
               <X className="h-4 w-4" />
               Clear
             </Button>

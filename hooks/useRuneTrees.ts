@@ -6,7 +6,7 @@ import { RuneTree } from '@/types'
 
 export function useRuneTrees() {
   const { locale } = useLocale()
-  
+
   const runeTreesQuery = useQuery<RuneTree[]>({
     queryKey: ['rune-trees', locale],
     queryFn: async () => {

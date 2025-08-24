@@ -31,12 +31,14 @@ export default function LocaleHomePage() {
           </CardHeader>
           <CardContent className="text-center space-y-6">
             <p className="text-lg text-gray-600 dark:text-gray-300">
-              Explore the vast world of League of Legends with our detailed database. Find the perfect build, discover new strategies, and master your favorite champions.
+              Explore the vast world of League of Legends with our detailed
+              database. Find the perfect build, discover new strategies, and
+              master your favorite champions.
             </p>
-            
+
             <div className="flex flex-wrap justify-center gap-4">
-              <Button 
-                size="lg" 
+              <Button
+                size="lg"
                 onClick={handleGoToData}
                 className="min-w-[200px]"
               >
@@ -48,37 +50,45 @@ export default function LocaleHomePage() {
               <Card>
                 <CardContent className="text-center p-6">
                   <div className="text-4xl mb-2">🏆</div>
-                  <h3 className="text-lg font-semibold mb-2">{translations.home.champions.title}</h3>
+                  <h3 className="text-lg font-semibold mb-2">
+                    {translations.home.champions.title}
+                  </h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     {translations.home.champions.description}
                   </p>
                 </CardContent>
               </Card>
-              
+
               <Card>
                 <CardContent className="text-center p-6">
                   <div className="text-4xl mb-2">⚔️</div>
-                  <h3 className="text-lg font-semibold mb-2">{translations.home.items.title}</h3>
+                  <h3 className="text-lg font-semibold mb-2">
+                    {translations.home.items.title}
+                  </h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     {translations.home.items.description}
                   </p>
                 </CardContent>
               </Card>
-              
+
               <Card>
                 <CardContent className="text-center p-6">
                   <div className="text-4xl mb-2">🔮</div>
-                  <h3 className="text-lg font-semibold mb-2">{translations.home.runes.title}</h3>
+                  <h3 className="text-lg font-semibold mb-2">
+                    {translations.home.runes.title}
+                  </h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     {translations.home.runes.description}
                   </p>
                 </CardContent>
               </Card>
-              
+
               <Card>
                 <CardContent className="text-center p-6">
                   <div className="text-4xl mb-2">✨</div>
-                  <h3 className="text-lg font-semibold mb-2">{translations.home.spells.title}</h3>
+                  <h3 className="text-lg font-semibold mb-2">
+                    {translations.home.spells.title}
+                  </h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     {translations.home.spells.description}
                   </p>

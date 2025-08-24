@@ -11,7 +11,7 @@ interface UseStatPerksParams {
 
 export function useStatPerks(params: UseStatPerksParams) {
   const { locale } = useLocale()
-  
+
   const statPerksQuery = useQuery({
     queryKey: ['stat-perks', locale, params.q, params.page],
     queryFn: async () => {
@@ -19,7 +19,7 @@ export function useStatPerks(params: UseStatPerksParams) {
         page: params.page,
         limit: params.limit,
         q: params.q,
-        locale
+        locale,
       })
     },
     staleTime: APP_CONFIG.CHAMPIONS_CACHE_TIME,

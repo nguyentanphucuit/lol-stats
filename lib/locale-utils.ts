@@ -26,14 +26,18 @@ export function getLocaleFromCode(code: LocaleCode): string {
  * @param locale - Locale value or code
  * @returns Locale-aware URL (e.g., '/en/champions' or '/vi/champions')
  */
-export function getLocaleUrl(path: string, locale: string | LocaleCode): string {
-  const code = typeof locale === 'string' && locale.includes('_') 
-    ? getLocaleCode(locale) 
-    : locale as LocaleCode
-  
+export function getLocaleUrl(
+  path: string,
+  locale: string | LocaleCode
+): string {
+  const code =
+    typeof locale === 'string' && locale.includes('_')
+      ? getLocaleCode(locale)
+      : (locale as LocaleCode)
+
   // Ensure path starts with /
   const cleanPath = path.startsWith('/') ? path : `/${path}`
-  
+
   return `/${code}${cleanPath}`
 }
 
@@ -45,10 +49,10 @@ export function getLocaleUrl(path: string, locale: string | LocaleCode): string 
 export function hasLocalePrefix(path: string): boolean {
   const validCodes = Object.values(LOCALE_CODES)
   const segments = path.split('/').filter(Boolean)
-  
+
   // Must have at least one segment and first segment must be a valid locale code
   if (segments.length === 0) return false
-  
+
   const firstSegment = segments[0]
   return validCodes.includes(firstSegment as any)
 }

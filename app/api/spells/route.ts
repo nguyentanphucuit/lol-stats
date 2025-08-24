@@ -7,7 +7,12 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const page = parseInt(searchParams.get('page') || '1')
-    const limit = Math.min(parseInt(searchParams.get('limit') || APP_CONFIG.ITEMS_PER_PAGE.toString()), APP_CONFIG.MAX_ITEMS_PER_PAGE)
+    const limit = Math.min(
+      parseInt(
+        searchParams.get('limit') || APP_CONFIG.ITEMS_PER_PAGE.toString()
+      ),
+      APP_CONFIG.MAX_ITEMS_PER_PAGE
+    )
     const searchQuery = searchParams.get('q') || ''
     const modes = searchParams.getAll('modes')
     const locale = searchParams.get('locale') || DEFAULT_LOCALE
@@ -39,16 +44,17 @@ export async function GET(request: NextRequest) {
       costType: spell.costType,
       resource: spell.resource,
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
     }))
 
     // Apply search filter
     let filteredSpells = allSpells
     if (searchQuery) {
-      filteredSpells = filteredSpells.filter((spell: any) =>
-        spell.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        spell.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        spell.key.toLowerCase().includes(searchQuery.toLowerCase())
+      filteredSpells = filteredSpells.filter(
+        (spell: any) =>
+          spell.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          spell.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          spell.key.toLowerCase().includes(searchQuery.toLowerCase())
       )
     }
 
@@ -71,9 +77,8 @@ export async function GET(request: NextRequest) {
       total,
       page,
       limit,
-      totalPages
+      totalPages,
     })
-
   } catch (error) {
     console.error('Error fetching spells:', error)
     return NextResponse.json(

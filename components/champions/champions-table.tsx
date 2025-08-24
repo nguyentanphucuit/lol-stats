@@ -1,7 +1,14 @@
 'use client'
 
 import Image from 'next/image'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Badge } from '@/components/ui/badge'
 import { Champion } from '@/types'
@@ -14,15 +21,21 @@ interface ChampionsTableProps {
   itemsPerPage: number
 }
 
-export function ChampionsTable({ champions, isLoading, itemsPerPage }: ChampionsTableProps) {
+export function ChampionsTable({
+  champions,
+  isLoading,
+  itemsPerPage,
+}: ChampionsTableProps) {
   const renderLoadingSkeletons = () => {
     const imageSize = APP_CONFIG.CHAMPION_IMAGE_SIZE
-    const imageSizeClass = `w-${imageSize/4} h-${imageSize/4}`
-    
+    const imageSizeClass = `w-${imageSize / 4} h-${imageSize / 4}`
+
     return Array.from({ length: itemsPerPage }).map((_, i) => (
       <TableRow key={i}>
         <TableCell>
-          <div className={`${imageSizeClass} rounded-md bg-gray-200 dark:bg-gray-700 flex items-center justify-center`}>
+          <div
+            className={`${imageSizeClass} rounded-md bg-gray-200 dark:bg-gray-700 flex items-center justify-center`}
+          >
             <Skeleton className={`${imageSizeClass} rounded-md`} />
           </div>
         </TableCell>
@@ -41,7 +54,7 @@ export function ChampionsTable({ champions, isLoading, itemsPerPage }: Champions
       </TableRow>
     ))
   }
-  
+
   const renderEmptyState = () => (
     <TableRow>
       <TableCell colSpan={4} className="text-center py-8">
@@ -52,22 +65,24 @@ export function ChampionsTable({ champions, isLoading, itemsPerPage }: Champions
       </TableCell>
     </TableRow>
   )
-  
+
   const renderChampionRow = (champion: Champion) => {
     const imageSize = APP_CONFIG.CHAMPION_IMAGE_SIZE
-    const imageSizeClass = `w-${imageSize/4} h-${imageSize/4}`
-    
+    const imageSizeClass = `w-${imageSize / 4} h-${imageSize / 4}`
+
     return (
       <TableRow key={champion.id}>
         <TableCell>
-          <div className={`${imageSizeClass} rounded-md bg-gray-200 dark:bg-gray-700 flex items-center justify-center`}>
-            <Image 
+          <div
+            className={`${imageSizeClass} rounded-md bg-gray-200 dark:bg-gray-700 flex items-center justify-center`}
+          >
+            <Image
               src={championService.getChampionImageUrl(champion.image)}
               alt={`${champion.name} portrait`}
               width={imageSize}
               height={imageSize}
               className="rounded-md object-cover"
-              onError={(e) => {
+              onError={e => {
                 console.error('Image failed to load:', champion.image, e)
                 // Show initials when image fails to load
                 const target = e.currentTarget as HTMLImageElement
@@ -77,9 +92,9 @@ export function ChampionsTable({ champions, isLoading, itemsPerPage }: Champions
                   parent.innerHTML = `<span class="text-gray-500 dark:text-gray-400 font-medium text-sm">${champion.name.charAt(0)}</span>`
                 }
               }}
-                          onLoad={() => {
-              // Image loaded successfully
-            }}
+              onLoad={() => {
+                // Image loaded successfully
+              }}
             />
           </div>
         </TableCell>
@@ -89,7 +104,7 @@ export function ChampionsTable({ champions, isLoading, itemsPerPage }: Champions
         </TableCell>
         <TableCell>
           <div className="flex flex-wrap gap-1">
-            {champion.tags.map((tag) => (
+            {champion.tags.map(tag => (
               <Badge key={tag} variant="outline" className="text-xs">
                 {tag}
               </Badge>
@@ -99,7 +114,7 @@ export function ChampionsTable({ champions, isLoading, itemsPerPage }: Champions
       </TableRow>
     )
   }
-  
+
   if (isLoading) {
     return (
       <Table>
@@ -111,13 +126,11 @@ export function ChampionsTable({ champions, isLoading, itemsPerPage }: Champions
             <TableHead>Tags</TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody>
-          {renderLoadingSkeletons()}
-        </TableBody>
+        <TableBody>{renderLoadingSkeletons()}</TableBody>
       </Table>
     )
   }
-  
+
   if (!champions || champions.length === 0) {
     return (
       <Table>
@@ -129,13 +142,11 @@ export function ChampionsTable({ champions, isLoading, itemsPerPage }: Champions
             <TableHead>Tags</TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody>
-          {renderEmptyState()}
-        </TableBody>
+        <TableBody>{renderEmptyState()}</TableBody>
       </Table>
     )
   }
-  
+
   return (
     <Table>
       <TableHeader>
@@ -146,9 +157,7 @@ export function ChampionsTable({ champions, isLoading, itemsPerPage }: Champions
           <TableHead>Tags</TableHead>
         </TableRow>
       </TableHeader>
-      <TableBody>
-        {champions.map(renderChampionRow)}
-      </TableBody>
+      <TableBody>{champions.map(renderChampionRow)}</TableBody>
     </Table>
   )
 }

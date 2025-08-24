@@ -27,10 +27,9 @@ export async function GET(
       headers: {
         'Content-Type': 'image/png',
         'Cache-Control': 'public, max-age=86400', // Cache for 24 hours
-        'Access-Control-Allow-Origin': '*'
-      }
+        'Access-Control-Allow-Origin': '*',
+      },
     })
-
   } catch (error) {
     console.error('Error fetching spell image:', error)
     return NextResponse.json(

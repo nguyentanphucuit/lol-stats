@@ -12,7 +12,7 @@ interface UseRunesParams {
 
 export function useRunes(params: UseRunesParams) {
   const { locale } = useLocale()
-  
+
   const runesQuery = useQuery({
     queryKey: ['runes', locale, params.q, params.styles, params.page],
     queryFn: async () => {
@@ -21,7 +21,7 @@ export function useRunes(params: UseRunesParams) {
         limit: params.limit,
         q: params.q,
         styles: params.styles,
-        locale
+        locale,
       })
     },
     staleTime: APP_CONFIG.CHAMPIONS_CACHE_TIME,

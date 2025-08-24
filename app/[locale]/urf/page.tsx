@@ -12,136 +12,211 @@ import Image from 'next/image'
 
 // URF builds configuration for champions
 const urfBuildsConfig = {
-  'Aatrox': {
+  Aatrox: {
     runes: {
       primary: {
         name: 'Precision',
         keystone: 'Conqueror',
         slots: [
-          { name: 'Triumph', description: 'Gain 12% missing health on takedown' },
-          { name: 'Legend: Tenacity', description: 'Gain 5% tenacity per stack' },
-          { name: 'Last Stand', description: 'Deal 5-11% increased damage when below 60% health' }
-        ]
+          {
+            name: 'Triumph',
+            description: 'Gain 12% missing health on takedown',
+          },
+          {
+            name: 'Legend: Tenacity',
+            description: 'Gain 5% tenacity per stack',
+          },
+          {
+            name: 'Last Stand',
+            description: 'Deal 5-11% increased damage when below 60% health',
+          },
+        ],
       },
       secondary: {
         name: 'Domination',
         keystone: '',
         slots: [
-          { name: 'Sudden Impact', description: 'Gain 7 Lethality and 6 Magic Penetration for 5s after using a dash, blink, or teleport' },
-          { name: 'Ravenous Hunter', description: 'Heal for 1% of damage dealt to champions' }
-        ]
-      }
+          {
+            name: 'Sudden Impact',
+            description:
+              'Gain 7 Lethality and 6 Magic Penetration for 5s after using a dash, blink, or teleport',
+          },
+          {
+            name: 'Ravenous Hunter',
+            description: 'Heal for 1% of damage dealt to champions',
+          },
+        ],
+      },
     },
     spells: ['Flash', 'Ignite'],
     items: {
-      core: ['Eclipse', 'Black Cleaver', 'Death\'s Dance'],
-      situational: ['Serylda\'s Grudge', 'Guardian Angel', 'Maw of Malmortius']
-    }
+      core: ['Eclipse', 'Black Cleaver', "Death's Dance"],
+      situational: ["Serylda's Grudge", 'Guardian Angel', 'Maw of Malmortius'],
+    },
   },
-  'Ahri': {
+  Ahri: {
     runes: {
       primary: {
         name: 'Domination',
         keystone: 'Electrocute',
         slots: [
-          { name: 'Taste of Blood', description: 'Heal when you damage an enemy champion' },
-          { name: 'Eyeball Collection', description: 'Gain 1 AD or AP per takedown' },
-          { name: 'Ravenous Hunter', description: 'Heal for 1% of damage dealt to champions' }
-        ]
+          {
+            name: 'Taste of Blood',
+            description: 'Heal when you damage an enemy champion',
+          },
+          {
+            name: 'Eyeball Collection',
+            description: 'Gain 1 AD or AP per takedown',
+          },
+          {
+            name: 'Ravenous Hunter',
+            description: 'Heal for 1% of damage dealt to champions',
+          },
+        ],
       },
       secondary: {
         name: 'Sorcery',
         keystone: '',
         slots: [
           { name: 'Manaflow Band', description: 'Gain 100 maximum mana' },
-          { name: 'Scorch', description: 'Your next ability hit sets champions on fire' }
-        ]
-      }
+          {
+            name: 'Scorch',
+            description: 'Your next ability hit sets champions on fire',
+          },
+        ],
+      },
     },
     spells: ['Flash', 'Ignite'],
     items: {
-      core: ['Luden\'s Tempest', 'Rabadon\'s Deathcap', 'Void Staff'],
-      situational: ['Morellonomicon', 'Zhonya\'s Hourglass', 'Banshee\'s Veil']
-    }
+      core: ["Luden's Tempest", "Rabadon's Deathcap", 'Void Staff'],
+      situational: ['Morellonomicon', "Zhonya's Hourglass", "Banshee's Veil"],
+    },
   },
-  'Akali': {
+  Akali: {
     runes: {
       primary: {
         name: 'Domination',
         keystone: 'Electrocute',
         slots: [
-          { name: 'Sudden Impact', description: 'Gain 7 Lethality and 6 Magic Penetration for 5s after using a dash, blink, or teleport' },
-          { name: 'Eyeball Collection', description: 'Gain 1 AD or AP per takedown' },
-          { name: 'Ravenous Hunter', description: 'Heal for 1% of damage dealt to champions' }
-        ]
+          {
+            name: 'Sudden Impact',
+            description:
+              'Gain 7 Lethality and 6 Magic Penetration for 5s after using a dash, blink, or teleport',
+          },
+          {
+            name: 'Eyeball Collection',
+            description: 'Gain 1 AD or AP per takedown',
+          },
+          {
+            name: 'Ravenous Hunter',
+            description: 'Heal for 1% of damage dealt to champions',
+          },
+        ],
       },
       secondary: {
         name: 'Precision',
         keystone: '',
         slots: [
-          { name: 'Triumph', description: 'Gain 12% missing health on takedown' },
-          { name: 'Coup de Grace', description: 'Deal 8% increased damage to champions below 40% health' }
-        ]
-      }
+          {
+            name: 'Triumph',
+            description: 'Gain 12% missing health on takedown',
+          },
+          {
+            name: 'Coup de Grace',
+            description:
+              'Deal 8% increased damage to champions below 40% health',
+          },
+        ],
+      },
     },
     spells: ['Flash', 'Ignite'],
     items: {
-      core: ['Hextech Rocketbelt', 'Lich Bane', 'Rabadon\'s Deathcap'],
-      situational: ['Void Staff', 'Zhonya\'s Hourglass', 'Banshee\'s Veil']
-    }
+      core: ['Hextech Rocketbelt', 'Lich Bane', "Rabadon's Deathcap"],
+      situational: ['Void Staff', "Zhonya's Hourglass", "Banshee's Veil"],
+    },
   },
-  'Alistar': {
+  Alistar: {
     runes: {
       primary: {
         name: 'Resolve',
         keystone: 'Aftershock',
         slots: [
-          { name: 'Demolish', description: 'Deal 100 + 15% max health damage to turrets' },
-          { name: 'Bone Plating', description: 'Take 3 less damage from the next 3 attacks' },
-          { name: 'Unflinching', description: 'Gain 10% tenacity and slow resistance' }
-        ]
+          {
+            name: 'Demolish',
+            description: 'Deal 100 + 15% max health damage to turrets',
+          },
+          {
+            name: 'Bone Plating',
+            description: 'Take 3 less damage from the next 3 attacks',
+          },
+          {
+            name: 'Unflinching',
+            description: 'Gain 10% tenacity and slow resistance',
+          },
+        ],
       },
       secondary: {
         name: 'Inspiration',
         keystone: '',
         slots: [
-          { name: 'Hextech Flashtraption', description: 'Gain a free flash every 20 seconds' },
-          { name: 'Cosmic Insight', description: 'Gain 5% CDR and 5% item CDR' }
-        ]
-      }
+          {
+            name: 'Hextech Flashtraption',
+            description: 'Gain a free flash every 20 seconds',
+          },
+          {
+            name: 'Cosmic Insight',
+            description: 'Gain 5% CDR and 5% item CDR',
+          },
+        ],
+      },
     },
     spells: ['Flash', 'Ignite'],
     items: {
       core: ['Sunfire Aegis', 'Thornmail', 'Force of Nature'],
-      situational: ['Randuin\'s Omen', 'Gargoyle Stoneplate', 'Warmog\'s Armor']
-    }
+      situational: ["Randuin's Omen", 'Gargoyle Stoneplate', "Warmog's Armor"],
+    },
   },
-  'Amumu': {
+  Amumu: {
     runes: {
       primary: {
         name: 'Resolve',
         keystone: 'Aftershock',
         slots: [
-          { name: 'Demolish', description: 'Deal 100 + 15% max health damage to turrets' },
-          { name: 'Bone Plating', description: 'Take 3 less damage from the next 3 attacks' },
-          { name: 'Unflinching', description: 'Gain 10% tenacity and slow resistance' }
-        ]
+          {
+            name: 'Demolish',
+            description: 'Deal 100 + 15% max health damage to turrets',
+          },
+          {
+            name: 'Bone Plating',
+            description: 'Take 3 less damage from the next 3 attacks',
+          },
+          {
+            name: 'Unflinching',
+            description: 'Gain 10% tenacity and slow resistance',
+          },
+        ],
       },
       secondary: {
         name: 'Domination',
         keystone: '',
         slots: [
-          { name: 'Cheap Shot', description: 'Deal 10-45 bonus true damage to impaired enemies' },
-          { name: 'Ravenous Hunter', description: 'Heal for 1% of damage dealt to champions' }
-        ]
-      }
+          {
+            name: 'Cheap Shot',
+            description: 'Deal 10-45 bonus true damage to impaired enemies',
+          },
+          {
+            name: 'Ravenous Hunter',
+            description: 'Heal for 1% of damage dealt to champions',
+          },
+        ],
+      },
     },
     spells: ['Flash', 'Smite'],
     items: {
       core: ['Sunfire Aegis', 'Thornmail', 'Abyssal Mask'],
-      situational: ['Randuin\'s Omen', 'Gargoyle Stoneplate', 'Warmog\'s Armor']
-    }
-  }
+      situational: ["Randuin's Omen", 'Gargoyle Stoneplate', "Warmog's Armor"],
+    },
+  },
 }
 
 export default function UrfPage() {
@@ -154,19 +229,19 @@ export default function UrfPage() {
     page: 1,
     limit: 5,
     q: '',
-    tags: []
+    tags: [],
   })
 
   const renderChampionAvatar = (champion: any) => (
     <div className="text-center">
       <div className="relative w-20 h-20 mx-auto mb-3">
-        <Image 
+        <Image
           src={championService.getChampionImageUrl(champion.image)}
           alt={`${champion.name} portrait`}
           width={80}
           height={80}
           className="rounded-full object-cover"
-          onError={(e) => {
+          onError={e => {
             console.error('Image failed to load:', champion.name, e)
             // Show initials when image fails to load
             const target = e.currentTarget as HTMLImageElement
@@ -188,7 +263,7 @@ export default function UrfPage() {
   )
 
   const renderRunes = (runes: any) => (
-    <BuildRunes 
+    <BuildRunes
       primary={runes.primary}
       secondary={runes.secondary}
       className="h-full"
@@ -287,7 +362,10 @@ export default function UrfPage() {
             Array.from({ length: 5 }).map((_, index) => (
               <div key={index} className="space-y-4">
                 {Array.from({ length: 5 }).map((_, cardIndex) => (
-                  <Card key={cardIndex} className="h-48 flex items-center justify-center">
+                  <Card
+                    key={cardIndex}
+                    className="h-48 flex items-center justify-center"
+                  >
                     <CardContent className="p-4">
                       <div className="animate-pulse">
                         <div className="w-20 h-20 bg-gray-300 rounded-full mx-auto mb-3"></div>
@@ -304,80 +382,96 @@ export default function UrfPage() {
               <p className="text-red-600">Failed to load champions</p>
             </div>
           ) : (
-            champions?.champions?.slice(0, 5).map((champion: any, index: number) => {
-              const buildConfig = urfBuildsConfig[champion.name as keyof typeof urfBuildsConfig]
-              
-              if (!buildConfig) {
-                return null // Skip champions without URF build config
-              }
+            champions?.champions
+              ?.slice(0, 5)
+              .map((champion: any, index: number) => {
+                const buildConfig =
+                  urfBuildsConfig[champion.name as keyof typeof urfBuildsConfig]
 
-              return (
-                <div key={champion.id} className="space-y-4">
-                  {/* Champion Avatar */}
-                  <Card className="h-48 flex items-center justify-center">
-                    <CardContent className="p-4">
-                      {renderChampionAvatar(champion)}
-                    </CardContent>
-                  </Card>
+                if (!buildConfig) {
+                  return null // Skip champions without URF build config
+                }
 
-                  {/* Runes */}
-                  <Card className="h-48">
-                    <CardContent className="p-4">
-                      {renderRunes(buildConfig.runes)}
-                    </CardContent>
-                  </Card>
+                return (
+                  <div key={champion.id} className="space-y-4">
+                    {/* Champion Avatar */}
+                    <Card className="h-48 flex items-center justify-center">
+                      <CardContent className="p-4">
+                        {renderChampionAvatar(champion)}
+                      </CardContent>
+                    </Card>
 
-                  {/* Spells */}
-                  <Card className="h-48 flex items-center justify-center">
-                    <CardContent className="p-4">
-                      {renderSpells(buildConfig.spells)}
-                    </CardContent>
-                  </Card>
+                    {/* Runes */}
+                    <Card className="h-48">
+                      <CardContent className="p-4">
+                        {renderRunes(buildConfig.runes)}
+                      </CardContent>
+                    </Card>
 
-                  {/* Core Items */}
-                  <Card className="h-48">
-                    <CardContent className="p-4">
-                      <div className="text-center">
-                        <div className="text-sm font-semibold text-gray-900 dark:text-white mb-2">
-                          Core Items
+                    {/* Spells */}
+                    <Card className="h-48 flex items-center justify-center">
+                      <CardContent className="p-4">
+                        {renderSpells(buildConfig.spells)}
+                      </CardContent>
+                    </Card>
+
+                    {/* Core Items */}
+                    <Card className="h-48">
+                      <CardContent className="p-4">
+                        <div className="text-center">
+                          <div className="text-sm font-semibold text-gray-900 dark:text-white mb-2">
+                            Core Items
+                          </div>
+                          <div className="space-y-1">
+                            {buildConfig.items.core.map(
+                              (item: string, itemIndex: number) => (
+                                <Badge
+                                  key={itemIndex}
+                                  variant="default"
+                                  className="text-xs"
+                                >
+                                  {item}
+                                </Badge>
+                              )
+                            )}
+                          </div>
                         </div>
-                        <div className="space-y-1">
-                          {buildConfig.items.core.map((item: string, itemIndex: number) => (
-                            <Badge key={itemIndex} variant="default" className="text-xs">
-                              {item}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                      </CardContent>
+                    </Card>
 
-                  {/* Situational Items */}
-                  <Card className="h-48">
-                    <CardContent className="p-4">
-                      <div className="text-center">
-                        <div className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">
-                          Situational
+                    {/* Situational Items */}
+                    <Card className="h-48">
+                      <CardContent className="p-4">
+                        <div className="text-center">
+                          <div className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">
+                            Situational
+                          </div>
+                          <div className="space-y-1">
+                            {buildConfig.items.situational.map(
+                              (item: string, itemIndex: number) => (
+                                <Badge
+                                  key={itemIndex}
+                                  variant="outline"
+                                  className="text-xs"
+                                >
+                                  {item}
+                                </Badge>
+                              )
+                            )}
+                          </div>
                         </div>
-                        <div className="space-y-1">
-                          {buildConfig.items.situational.map((item: string, itemIndex: number) => (
-                            <Badge key={itemIndex} variant="outline" className="text-xs">
-                              {item}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              )
-            })
+                      </CardContent>
+                    </Card>
+                  </div>
+                )
+              })
           )}
         </div>
 
         <div className="mt-8 text-center">
           <p className="text-gray-600 dark:text-gray-400">
-            More champion builds coming soon! URF mode is all about fast-paced action and unique strategies.
+            More champion builds coming soon! URF mode is all about fast-paced
+            action and unique strategies.
           </p>
         </div>
       </div>

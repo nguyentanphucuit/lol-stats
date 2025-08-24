@@ -8,29 +8,28 @@ export async function GET(
   try {
     const { champion } = await params
     const imageUrl = `${LEAGUE_CONFIG.CHAMPION_IMAGE_URL}/${champion}`
-    
+
     // Fetch the image from DDragon CDN
     const response = await fetch(imageUrl)
-    
+
     if (!response.ok) {
       return NextResponse.json(
         { error: 'Champion image not found' },
         { status: 404 }
       )
     }
-    
+
     // Get the image data
     const imageBuffer = await response.arrayBuffer()
-    
+
     // Return the image with proper headers
     return new NextResponse(imageBuffer, {
       headers: {
         'Content-Type': 'image/png',
         'Cache-Control': 'public, max-age=86400', // Cache for 24 hours
-        'Access-Control-Allow-Origin': '*'
-      }
+        'Access-Control-Allow-Origin': '*',
+      },
     })
-    
   } catch (error) {
     console.error('Error fetching champion image:', error)
     return NextResponse.json(

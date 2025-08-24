@@ -3,7 +3,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 import { useLocale } from '@/components/providers/locale-provider'
 import { getLocaleCode } from '@/lib/locale-utils'
 import { getTranslations } from '@/lib/translations'
@@ -36,7 +41,10 @@ export default function RunesBuildsPage() {
                           <div className="h-4 bg-gray-300 rounded w-1/2 mb-2"></div>
                           <div className="space-y-2">
                             {Array.from({ length: 3 }).map((_, runeIndex) => (
-                              <div key={runeIndex} className="h-3 bg-gray-300 rounded w-full"></div>
+                              <div
+                                key={runeIndex}
+                                className="h-3 bg-gray-300 rounded w-full"
+                              ></div>
                             ))}
                           </div>
                         </div>
@@ -99,7 +107,7 @@ export default function RunesBuildsPage() {
                         width={40}
                         height={40}
                         className="rounded-lg object-cover"
-                        onError={(e) => {
+                        onError={e => {
                           console.error('Image failed to load:', tree.icon, e)
                           // Show initials when image fails to load
                           const target = e.currentTarget as HTMLImageElement
@@ -122,20 +130,27 @@ export default function RunesBuildsPage() {
                           {slot.name}
                         </h4>
                         <div className="flex justify-between items-center">
-                          {slot.runes.map((rune) => (
+                          {slot.runes.map(rune => (
                             <Tooltip key={rune.id}>
                               <TooltipTrigger asChild>
                                 <div className="w-10 h-10 relative flex-shrink-0 rounded bg-gray-200 dark:bg-gray-700 flex items-center justify-center cursor-help hover:scale-110 transition-transform duration-200">
                                   <Image
-                                    src={runesService.getRuneImageUrl(rune.icon)}
+                                    src={runesService.getRuneImageUrl(
+                                      rune.icon
+                                    )}
                                     alt={`${rune.name} icon`}
                                     width={48}
                                     height={48}
                                     className="rounded object-cover"
-                                    onError={(e) => {
-                                      console.error('Image failed to load:', rune.icon, e)
+                                    onError={e => {
+                                      console.error(
+                                        'Image failed to load:',
+                                        rune.icon,
+                                        e
+                                      )
                                       // Show initials when image fails to load
-                                      const target = e.currentTarget as HTMLImageElement
+                                      const target =
+                                        e.currentTarget as HTMLImageElement
                                       target.style.display = 'none'
                                       const parent = target.parentElement
                                       if (parent) {
@@ -150,19 +165,28 @@ export default function RunesBuildsPage() {
                                   <div className="flex items-center gap-2">
                                     <div className="w-5 h-5 relative">
                                       <Image
-                                        src={runesService.getRuneImageUrl(rune.icon)}
+                                        src={runesService.getRuneImageUrl(
+                                          rune.icon
+                                        )}
                                         alt={`${rune.name} icon`}
                                         width={20}
                                         height={20}
                                         className="rounded object-cover"
                                       />
                                     </div>
-                                    <p className="font-bold text-blue-600 dark:text-blue-400">{rune.name}</p>
+                                    <p className="font-bold text-blue-600 dark:text-blue-400">
+                                      {rune.name}
+                                    </p>
                                   </div>
                                   <div className="border-t border-gray-200 dark:border-gray-600 pt-2">
-                                    <p className="text-sm text-gray-700 dark:text-gray-300">{rune.shortDesc || 'No description available'}</p>
+                                    <p className="text-sm text-gray-700 dark:text-gray-300">
+                                      {rune.shortDesc ||
+                                        'No description available'}
+                                    </p>
                                     {rune.longDesc && (
-                                      <p className="text-xs text-gray-400 mt-1 italic">{rune.longDesc}</p>
+                                      <p className="text-xs text-gray-400 mt-1 italic">
+                                        {rune.longDesc}
+                                      </p>
                                     )}
                                   </div>
                                 </div>
@@ -177,7 +201,6 @@ export default function RunesBuildsPage() {
               </Card>
             ))}
           </div>
-
         </div>
       </div>
     </TooltipProvider>

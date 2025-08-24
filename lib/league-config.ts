@@ -8,23 +8,23 @@ export const LOCAL = DEFAULT_LOCALE
 export const LEAGUE_CONFIG = {
   // Default patch version
   PATCH: ENV_CONFIG.LEAGUE_PATCH,
-  
+
   // DDragon API base URL
   DDRAGON_BASE_URL: ENV_CONFIG.DDRAION_BASE_URL,
-  
+
   // Default locale
   LOCAL,
-  
+
   // Champion image endpoint
   get CHAMPION_IMAGE_URL() {
     return `${this.DDRAGON_BASE_URL}/${this.PATCH}/img/champion`
   },
-  
+
   // Champion sprite endpoint
   get CHAMPION_SPRITE_URL() {
     return `${this.DDRAGON_BASE_URL}/${this.PATCH}/img/sprite`
   },
-  
+
   // Items image endpoint
   get ITEMS_IMAGE_URL() {
     return `${this.DDRAGON_BASE_URL}/${this.PATCH}/img/item`
@@ -43,7 +43,7 @@ export const LEAGUE_CONFIG = {
   // Stat perks image endpoint
   get STAT_PERKS_IMAGE_URL() {
     return `${this.DDRAGON_BASE_URL}/img`
-  }
+  },
 } as const
 
 // Separate functions that use the config

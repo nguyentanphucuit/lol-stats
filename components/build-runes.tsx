@@ -20,7 +20,11 @@ interface BuildRunesProps {
   className?: string
 }
 
-export function BuildRunes({ primary, secondary, className = '' }: BuildRunesProps) {
+export function BuildRunes({
+  primary,
+  secondary,
+  className = '',
+}: BuildRunesProps) {
   return (
     <div className={`space-y-4 ${className}`}>
       {/* Primary Path */}
@@ -39,11 +43,14 @@ export function BuildRunes({ primary, secondary, className = '' }: BuildRunesPro
               <div className="text-xs font-bold text-gray-900 dark:text-white mb-1">
                 Keystone
               </div>
-              <Badge variant="outline" className="text-xs bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800">
+              <Badge
+                variant="outline"
+                className="text-xs bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800"
+              >
                 {primary.keystone}
               </Badge>
             </div>
-            
+
             {/* Primary Slots */}
             <div className="space-y-2">
               {primary.slots.map((slot, index) => (

@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const locale = searchParams.get('locale') || DEFAULT_LOCALE
-    
+
     // Fetch runes data from DDragon API with specified locale
     const response = await fetch(getRunesDataUrl(locale))
 
@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     }
 
     const data = await response.json()
-    
+
     // Map the data to the required structure
     const runeTrees: RuneTree[] = data.map((style: any) => ({
       id: style.id,
@@ -31,9 +31,9 @@ export async function GET(request: NextRequest) {
           icon: rune.icon,
           name: rune.name,
           shortDesc: rune.shortDesc,
-          longDesc: rune.longDesc
-        }))
-      }))
+          longDesc: rune.longDesc,
+        })),
+      })),
     }))
 
     return NextResponse.json(runeTrees)

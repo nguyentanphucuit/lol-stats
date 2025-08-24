@@ -55,11 +55,11 @@ export const spellsService = {
     if (locale) {
       queryParams.append('locale', locale)
     }
-    
+
     const response = await fetch(`/api/spells/modes?${queryParams.toString()}`)
     if (!response.ok) {
       throw new Error('Failed to fetch modes')
     }
     return response.json()
-  }
+  },
 }

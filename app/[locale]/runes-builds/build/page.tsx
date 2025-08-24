@@ -1,106 +1,347 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { useLocale } from '@/components/providers/locale-provider'
-import { getLocaleCode } from '@/lib/locale-utils'
-import { getTranslations } from '@/lib/translations'
-import { useChampions } from '@/hooks/useChampions'
-import { useRuneTrees } from '@/hooks/useRuneTrees'
-import { useStatPerks } from '@/hooks/useStatPerks'
-import { runesService } from '@/lib/runes-service'
-import { statPerksService } from '@/lib/stat-perks-service'
-import Image from 'next/image'
-import { ArrowLeft, Plus, X } from 'lucide-react'
-import Link from 'next/link'
-
-interface SelectedRune {
-  id: number
-  name: string
-  icon: string
-  slot: string
-  style: string
-}
-
-interface SelectedStatPerk {
-  id: number
-  name: string
-  iconUrl: string
-}
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { useLocale } from "@/components/providers/locale-provider";
+import { getLocaleCode } from "@/lib/locale-utils";
+import { useChampions } from "@/hooks/useChampions";
+import { useRuneTrees } from "@/hooks/useRuneTrees";
+import { useStatPerks } from "@/hooks/useStatPerks";
+import { runesService } from "@/lib/runes-service";
+import Image from "next/image";
+import { ArrowLeft, Plus } from "lucide-react";
+import Link from "next/link";
+import { PrimaryTreeSelector } from "@/components/runes/primary-tree-selector";
+import { SecondaryTreeSelector } from "@/components/runes/secondary-tree-selector";
+import { ShardSelector } from "@/components/runes/shard-selector";
+import { SaveBuildModal } from "@/components/runes/save-build-modal";
+import { ChampionSection } from "@/components/champions/champion-section";
+import { ChampionSelectorModal } from "@/components/champions/champion-selector-modal";
+import { ItemsSelector, SelectedItem } from "@/components/items/items-selector";
+import {
+  ModeSelector,
+  GAME_MODES,
+} from "@/components/game-modes/mode-selector";
+import type { Champion } from "@/components/champions/champion-section";
+import type { GameMode } from "@/components/game-modes/mode-selector";
+import {
+  RuneTree,
+  SelectedRune,
+  SelectedShard,
+} from "@/components/runes/types";
 
 export default function RuneBuilderPage() {
-  const { locale } = useLocale()
-  const currentLocaleCode = getLocaleCode(locale)
-  const translations = getTranslations(locale)
-  
-  // State for selected champion
-  const [selectedChampion, setSelectedChampion] = useState<any>(null)
-  const [showChampionSelector, setShowChampionSelector] = useState(false)
-  
-  // State for selected runes
-  const [selectedRunes, setSelectedRunes] = useState<SelectedRune[]>([])
-  const [selectedStatPerks, setSelectedStatPerks] = useState<SelectedStatPerk[]>([])
-  
+  const { locale } = useLocale();
+  const currentLocaleCode = getLocaleCode(locale);
+
+  // State
+  const [selectedChampion, setSelectedChampion] = useState<Champion | null>(
+    null
+  );
+  const [showChampionSelector, setShowChampionSelector] = useState(false);
+  const [selectedRunes, setSelectedRunes] = useState<SelectedRune[]>([]);
+  const [selectedTree, setSelectedTree] = useState<RuneTree | null>(null);
+  const [selectedSecondaryTree, setSelectedSecondaryTree] =
+    useState<RuneTree | null>(null);
+  const [selectedShards, setSelectedShards] = useState<SelectedShard[]>([]);
+  const [selectedMode, setSelectedMode] = useState<GameMode | null>(null);
+  const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([]);
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
   // Hooks
   const { champions, isLoading: championsLoading } = useChampions({
     page: 1,
-    limit: 100,
-    q: ''
-  })
-  
-  const { runeTrees, isLoading: runeTreesLoading } = useRuneTrees()
+    limit: 200, // Increased to fetch all champions (LoL has ~160+ champions)
+    q: "",
+  });
+
+  const { runeTrees, isLoading: runeTreesLoading } = useRuneTrees();
   const { statPerks, isLoading: statPerksLoading } = useStatPerks({
     page: 1,
-    limit: 30,
-    q: ''
-  })
+    limit: 200, // Increased to fetch all stat perks
+  });
 
-  // Handle champion selection
-  const handleChampionSelect = (champion: any) => {
-    setSelectedChampion(champion)
-    setShowChampionSelector(false)
-  }
+  // Effects
+  useEffect(() => {
+    if (runeTrees && runeTrees.length > 0 && !selectedTree) {
+      setSelectedTree(runeTrees[0]);
+    }
+  }, [runeTrees, selectedTree]);
 
-  // Handle rune selection
-  const handleRuneSelect = (rune: any, slot: string, style: string) => {
+  // Auto-select first game mode
+  useEffect(() => {
+    if (!selectedMode) {
+      setSelectedMode(GAME_MODES[0]);
+    }
+  }, [selectedMode]);
+
+  // Auto-select first available secondary tree when primary tree changes
+  useEffect(() => {
+    if (selectedTree && runeTrees && runeTrees.length > 0) {
+      const availableSecondaryTrees = runeTrees.filter(
+        (tree) => tree.id !== selectedTree.id
+      );
+      if (availableSecondaryTrees.length > 0 && !selectedSecondaryTree) {
+        setSelectedSecondaryTree(availableSecondaryTrees[0]);
+      }
+    }
+  }, [selectedTree, runeTrees, selectedSecondaryTree]);
+
+  // Event handlers
+  const handleChampionSelect = (champion: Champion) => {
+    setSelectedChampion(champion);
+    setShowChampionSelector(false);
+  };
+
+  const handleTreeSelect = (tree: RuneTree) => {
+    setSelectedTree(tree);
+    setSelectedRunes([]);
+    setSelectedSecondaryTree(null); // Reset secondary tree when primary changes
+  };
+
+  const handleSecondaryTreeSelect = (tree: RuneTree) => {
+    setSelectedSecondaryTree(tree);
+  };
+
+  const handleShardSelect = (shard: any, slotIndex: number) => {
+    const newShard: SelectedShard = {
+      id: shard.id,
+      name: shard.name,
+      icon: shard.iconUrl,
+      slotIndex,
+      category: shard.category,
+    };
+
+    setSelectedShards((prev) => {
+      const filtered = prev.filter((s) => s.slotIndex !== slotIndex);
+      return [...filtered, newShard];
+    });
+  };
+
+  const handleModeSelect = (mode: GameMode) => {
+    setSelectedMode(mode);
+  };
+
+  const handleItemSelect = (item: any, slotIndex: number) => {
+    const newItem: SelectedItem = {
+      id: item.id,
+      name: item.name,
+      icon: item.image, // Use the full image URL from API
+      gold: item.gold.total,
+      slotIndex,
+    };
+
+    setSelectedItems((prev) => {
+      const filtered = prev.filter((i) => i.slotIndex !== slotIndex);
+      return [...filtered, newItem];
+    });
+  };
+
+  const handleItemRemove = (slotIndex: number) => {
+    setSelectedItems((prev) =>
+      prev.filter((item) => item.slotIndex !== slotIndex)
+    );
+  };
+
+  const isBuildComplete = () => {
+    // Check if we have all required selections
+    if (
+      !selectedMode ||
+      !selectedTree ||
+      !selectedSecondaryTree ||
+      selectedRunes.length === 0 ||
+      selectedShards.length === 0 ||
+      selectedItems.length < 6
+    ) {
+      return false;
+    }
+
+    // Check if we have all 4 primary runes (slots 1-4)
+    const primaryRunes = selectedRunes.filter(
+      (r) => r.style === selectedTree.name
+    );
+    if (primaryRunes.length < 4) {
+      return false;
+    }
+
+    // Check if we have exactly 2 secondary runes
+    const secondaryRunes = selectedRunes.filter(
+      (r) => r.style === selectedSecondaryTree.name
+    );
+    if (secondaryRunes.length < 2) {
+      return false;
+    }
+
+    // Check if we have all 3 stat shards
+    if (selectedShards.length < 3) {
+      return false;
+    }
+
+    // Check if we have all 6 items
+    if (selectedItems.length < 6) {
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleSaveBuild = () => {
+    setShowSaveModal(true);
+  };
+
+  const handleConfirmSave = async () => {
+    try {
+      setIsSaving(true);
+
+      // Validate required data
+      if (!selectedTree || !selectedSecondaryTree || !selectedMode) {
+        throw new Error("Missing required build data");
+      }
+
+      // Validate that IDs exist
+      if (!selectedTree.id || !selectedSecondaryTree.id || !selectedMode.id) {
+        throw new Error("Missing required build IDs");
+      }
+
+      // Prepare data for API
+      const primaryRunes = selectedRunes
+        .filter((r) => r.style === selectedTree.name)
+        .sort((a, b) => a.slotNumber - b.slotNumber)
+        .map((rune) => ({
+          ...rune,
+          id: rune.id?.toString() || String(rune.id), // Safe conversion with fallback
+        }));
+
+      const secondaryRunes = selectedRunes
+        .filter((r) => r.style === selectedSecondaryTree.name)
+        .sort((a, b) => a.slotNumber - b.slotNumber)
+        .map((rune) => ({
+          ...rune,
+          id: rune.id?.toString() || String(rune.id), // Safe conversion with fallback
+        }));
+
+      const buildData = {
+        championKey: selectedChampion?.id?.toString(),
+        championName: selectedChampion?.name,
+        gameMode: selectedMode.id,
+        primaryTreeId: selectedTree.id.toString(),
+        primaryTreeName: selectedTree.name,
+        secondaryTreeId: selectedSecondaryTree.id.toString(),
+        secondaryTreeName: selectedSecondaryTree.name,
+        primaryRunes,
+        secondaryRunes,
+        statShards: selectedShards
+          .sort((a, b) => a.slotIndex - b.slotIndex)
+          .map((shard) => ({
+            ...shard,
+            id: shard.id?.toString() || String(shard.id), // Safe conversion with fallback
+          })),
+        selectedItems: selectedItems
+          .sort((a, b) => a.slotIndex - b.slotIndex)
+          .map((item) => ({
+            ...item,
+            id: item.id?.toString() || String(item.id), // Safe conversion with fallback
+          })),
+      };
+
+      // Save to database via API
+      let response;
+      try {
+        response = await fetch("/api/rune-builds", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(buildData),
+        });
+      } catch (fetchError) {
+        throw new Error(
+          `Network error: ${fetchError instanceof Error ? fetchError.message : "Unknown fetch error"}`
+        );
+      }
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          errorData.error || `HTTP ${response.status}: ${response.statusText}`
+        );
+      }
+
+      const result = await response.json();
+
+      // Show success message
+      alert("Rune build saved successfully to database!");
+
+      // Reset form or close modal
+      setShowSaveModal(false);
+
+      // Optionally reset selections
+      // setSelectedRunes([]);
+      // setSelectedShards([]);
+    } catch (error) {
+      console.error("Error saving rune build:", error);
+      alert(
+        `Failed to save rune build: ${error instanceof Error ? error.message : "Unknown error"}`
+      );
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleRuneSelect = (rune: any, slotIndex: number, style: string) => {
     const newRune: SelectedRune = {
       id: rune.id,
       name: rune.name,
       icon: rune.icon,
-      slot,
-      style
-    }
-    
-    // Replace existing rune in same slot/style
-    setSelectedRunes(prev => {
-      const filtered = prev.filter(r => !(r.slot === slot && r.style === style))
-      return [...filtered, newRune]
-    })
-  }
+      slotNumber: slotIndex + 1, // Convert to 1-based slot numbers
+      style,
+    };
 
-  // Handle stat perk selection
-  const handleStatPerkSelect = (perk: any) => {
-    if (selectedStatPerks.length >= 3) {
-      // Replace the last one if we already have 3
-      setSelectedStatPerks(prev => [...prev.slice(0, 2), perk])
-    } else {
-      setSelectedStatPerks(prev => [...prev, perk])
-    }
-  }
+    setSelectedRunes((prev) => {
+      // Check if this is a secondary tree selection
+      const isSecondaryTree =
+        selectedSecondaryTree && style === selectedSecondaryTree.name;
 
-  // Remove stat perk
-  const removeStatPerk = (index: number) => {
-    setSelectedStatPerks(prev => prev.filter((_, i) => i !== index))
-  }
+      if (isSecondaryTree) {
+        // For secondary tree: 1 rune per slot, max 2 total
+        const secondaryRunes = prev.filter((r) => r.style === style);
+        const currentSlotRunes = prev.filter(
+          (r) => r.slotNumber === slotIndex + 1 && r.style === style
+        );
+
+        // If selecting in a slot that already has a rune, replace it
+        if (currentSlotRunes.length > 0) {
+          const filtered = prev.filter(
+            (r) => !(r.slotNumber === slotIndex + 1 && r.style === style)
+          );
+          return [...filtered, newRune];
+        }
+
+        // If we're at max 2 runes, remove the oldest one
+        if (secondaryRunes.length >= 2) {
+          const oldestSecondaryRune = secondaryRunes[0];
+          const filtered = prev.filter((r) => r.id !== oldestSecondaryRune.id);
+          return [...filtered, newRune];
+        }
+      }
+
+      // For primary tree or when under limit, use normal logic
+      const filtered = prev.filter(
+        (r) => !(r.slotNumber === slotIndex + 1 && r.style === style)
+      );
+      const result = [...filtered, newRune];
+      return result;
+    });
+  };
 
   return (
     <TooltipProvider>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <div className="container mx-auto px-4 py-8">
-          {/* Header with back button */}
+          {/* Header */}
           <div className="flex items-center gap-4 mb-8">
             <Link href={`/${currentLocaleCode}/runes-builds`}>
               <Button variant="outline" size="sm">
@@ -118,233 +359,120 @@ export default function RuneBuilderPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Left Column - Champion Selection */}
-            <div className="lg:col-span-1">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Champion</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {selectedChampion ? (
-                    <div className="text-center">
-                      <div className="w-24 h-24 mx-auto mb-4 relative rounded-lg overflow-hidden">
-                        <Image
-                          src={selectedChampion.image}
-                          alt={selectedChampion.name}
-                          width={96}
-                          height={96}
-                          className="object-cover"
-                        />
-                      </div>
-                      <h3 className="text-lg font-semibold mb-2">{selectedChampion.name}</h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">{selectedChampion.title}</p>
-                      <div className="flex flex-wrap gap-1 justify-center mb-4">
-                        {selectedChampion.tags?.map((tag: string) => (
-                          <Badge key={tag} variant="secondary" className="text-xs">
-                            {tag}
-                          </Badge>
-                        ))}
-                      </div>
-                      <Button 
-                        variant="outline" 
-                        onClick={() => setShowChampionSelector(true)}
-                        className="w-full"
-                      >
-                        Change Champion
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="text-center py-8">
-                      <div className="w-24 h-24 mx-auto mb-4 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center">
-                        <Plus className="w-8 h-8 text-gray-400" />
-                      </div>
-                      <p className="text-gray-500 mb-4">No champion selected</p>
-                      <Button onClick={() => setShowChampionSelector(true)}>
-                        Select Champion
-                      </Button>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* Stat Perks Selection */}
-              <Card className="mt-6">
-                <CardHeader>
-                  <CardTitle>Stat Perks</CardTitle>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Select up to 3 stat perks
-                  </p>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {selectedStatPerks.map((perk, index) => (
-                      <div key={index} className="flex items-center gap-3 p-2 bg-gray-50 dark:bg-gray-800 rounded">
-                        <Image
-                          src={perk.iconUrl}
-                          alt={perk.name}
-                          width={24}
-                          height={24}
-                          className="rounded"
-                        />
-                        <span className="text-sm flex-1">{perk.name}</span>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => removeStatPerk(index)}
-                        >
-                          <X className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    ))}
-                    
-                    {selectedStatPerks.length < 3 && (
-                      <div className="text-center py-4">
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => setShowChampionSelector(true)}
-                        >
-                          <Plus className="w-4 h-4 mr-2" />
-                          Add Stat Perk
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Right Column - Rune Selection */}
-            <div className="lg:col-span-2">
-              <Card>
+          {/* Right Column - Rune Selection */}
+          <div className="lg:col-span-2">
+            <div className="flex flex-col lg:flex-row gap-6 mb-6">
+              <ChampionSection
+                selectedChampion={selectedChampion}
+                onShowChampionSelector={() => setShowChampionSelector(true)}
+              />
+              <ModeSelector
+                selectedMode={selectedMode}
+                onModeSelect={handleModeSelect}
+              />
+              <Card className="flex-1">
                 <CardHeader>
                   <CardTitle>Rune Build</CardTitle>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Select runes for each slot
-                  </p>
                 </CardHeader>
                 <CardContent>
-                  {runeTreesLoading ? (
+                  {runeTreesLoading || statPerksLoading ? (
                     <div className="text-center py-8">
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
-                      <p className="mt-2 text-gray-600">Loading rune trees...</p>
+                      <p className="mt-2 text-gray-600">
+                        Loading rune trees...
+                      </p>
                     </div>
                   ) : (
-                    <div className="space-y-6">
-                      {runeTrees?.map((tree) => (
-                        <div key={tree.id} className="border rounded-lg p-4">
-                          <div className="flex items-center gap-3 mb-4">
-                            <div className="w-8 h-8 relative">
-                              <Image
-                                src={runesService.getRuneImageUrl(tree.icon)}
-                                alt={tree.name}
-                                width={32}
-                                height={32}
-                                className="rounded"
-                              />
-                            </div>
-                            <h3 className="font-semibold">{tree.name}</h3>
-                            <Badge variant="outline">{tree.key}</Badge>
-                          </div>
-                          
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {tree.slots.map((slot, slotIndex) => (
-                              <div key={slotIndex} className="border-l-2 border-gray-200 pl-4">
-                                <h4 className="font-medium text-sm mb-2">{slot.name}</h4>
-                                <div className="flex flex-wrap gap-2">
-                                  {slot.runes.map((rune) => {
-                                    const isSelected = selectedRunes.some(
-                                      r => r.id === rune.id && r.slot === slot.name && r.style === tree.name
-                                    )
-                                    return (
-                                      <Tooltip key={rune.id}>
-                                        <TooltipTrigger asChild>
-                                          <Button
-                                            variant={isSelected ? "default" : "outline"}
-                                            size="sm"
-                                            className="p-1 h-auto"
-                                            onClick={() => handleRuneSelect(rune, slot.name, tree.name)}
-                                          >
-                                            <Image
-                                              src={runesService.getRuneImageUrl(rune.icon)}
-                                              alt={rune.name}
-                                              width={32}
-                                              height={32}
-                                              className="rounded"
-                                            />
-                                          </Button>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                          <div className="max-w-xs">
-                                            <p className="font-semibold">{rune.name}</p>
-                                            <p className="text-sm">{rune.shortDesc}</p>
-                                          </div>
-                                        </TooltipContent>
-                                      </Tooltip>
-                                    )
-                                  })}
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
+                    <div className="flex flex-col xl:flex-row gap-8">
+                      {/* Primary Tree */}
+                      <PrimaryTreeSelector
+                        runeTrees={runeTrees}
+                        selectedTree={selectedTree}
+                        selectedRunes={selectedRunes}
+                        onTreeSelect={handleTreeSelect}
+                        onRuneSelect={handleRuneSelect}
+                      />
+
+                      {/* Secondary Tree */}
+                      <div className="w-full xl:w-32">
+                        <SecondaryTreeSelector
+                          runeTrees={runeTrees}
+                          selectedTree={selectedTree}
+                          selectedSecondaryTree={selectedSecondaryTree}
+                          selectedRunes={selectedRunes}
+                          onSecondaryTreeSelect={handleSecondaryTreeSelect}
+                          onRuneSelect={handleRuneSelect}
+                        />
+
+                        {/* Shards */}
+                        <ShardSelector
+                          statPerks={statPerks}
+                          selectedShards={selectedShards}
+                          onShardSelect={handleShardSelect}
+                          locale={locale}
+                        />
+                      </div>
                     </div>
                   )}
                 </CardContent>
               </Card>
+              {/* Items Selector */}
+              <ItemsSelector
+                selectedItems={selectedItems}
+                onItemSelect={handleItemSelect}
+                onItemRemove={handleItemRemove}
+              />
             </div>
           </div>
+        </div>
 
-          {/* Champion Selector Modal */}
-          {showChampionSelector && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-              <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-semibold">Select Champion</h2>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setShowChampionSelector(false)}
-                  >
-                    <X className="w-4 h-4" />
-                  </Button>
-                </div>
-                
-                {championsLoading ? (
-                  <div className="text-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
-                    <p className="mt-2 text-gray-600">Loading champions...</p>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {champions?.champions?.map((champion: any) => (
-                      <div
-                        key={champion.id}
-                        className="text-center p-3 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors"
-                        onClick={() => handleChampionSelect(champion)}
-                      >
-                        <div className="w-16 h-16 mx-auto mb-2 relative rounded-lg overflow-hidden">
-                          <Image
-                            src={champion.image}
-                            alt={champion.name}
-                            width={64}
-                            height={64}
-                            className="object-cover"
-                          />
-                        </div>
-                        <p className="text-sm font-medium truncate">{champion.name}</p>
-                        <p className="text-xs text-gray-500 truncate">{champion.title}</p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
+        {/* Save Build Button */}
+        <div className="mt-6 text-center">
+          <Button
+            onClick={() => handleSaveBuild()}
+            disabled={!isBuildComplete()}
+            className={`px-8 py-2 ${
+              isBuildComplete()
+                ? "bg-blue-600 hover:bg-blue-700 text-white"
+                : "bg-gray-400 text-gray-200 cursor-not-allowed"
+            }`}
+          >
+            Save Build
+          </Button>
+          {!isBuildComplete() && (
+            <p className="text-sm text-gray-500 mt-2">
+              Select game mode, champion, all required runes, shards, and items
+              to enable save
+            </p>
           )}
         </div>
+
+        {/* Champion Selector Modal */}
+        <ChampionSelectorModal
+          showChampionSelector={showChampionSelector}
+          champions={champions}
+          championsLoading={championsLoading}
+          onChampionSelect={handleChampionSelect}
+          onClose={() => setShowChampionSelector(false)}
+        />
+
+        {/* Save Build Modal */}
+        <SaveBuildModal
+          isOpen={showSaveModal}
+          buildData={{
+            champion: selectedChampion,
+            gameMode: selectedMode,
+            primaryTree: selectedTree,
+            secondaryTree: selectedSecondaryTree,
+            selectedRunes: selectedRunes,
+            selectedShards: selectedShards,
+            selectedItems: selectedItems,
+          }}
+          onConfirm={handleConfirmSave}
+          onCancel={() => setShowSaveModal(false)}
+          isSaving={isSaving}
+        />
       </div>
     </TooltipProvider>
-  )
+  );
 }

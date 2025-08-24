@@ -9,7 +9,7 @@ interface DataErrorProps {
 
 export function DataError({
   message = 'Failed to load data. Please try again later.',
-  title = 'Error'
+  title = 'Error',
 }: DataErrorProps) {
   return (
     <div className="container mx-auto px-4 py-8">

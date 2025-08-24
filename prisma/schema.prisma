@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,14 +8,32 @@ datasource db {
 }
 
 model Champion {
-  id          String   @id @default(cuid())
-  key         String   @unique
-  name        String
-  title       String
-  tags        String[] // Array of champion tags (e.g., ["Fighter", "Tank"])
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id @default(cuid())
+  key       String   @unique
+  name      String
+  title     String
+  tags      String[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("champions")
 }
 
+model RuneBuild {
+  id                String   @id @default(cuid())
+  championKey       String?
+  championName      String?
+  gameMode          String
+  primaryTreeId     String
+  primaryTreeName   String
+  secondaryTreeId   String
+  secondaryTreeName String
+  primaryRunes      Json
+  secondaryRunes    Json
+  statShards        Json
+  selectedItems     Json     @default("[]")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@map("rune_builds")
+}

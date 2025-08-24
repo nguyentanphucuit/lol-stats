@@ -6,7 +6,7 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const locale = searchParams.get('locale') || DEFAULT_LOCALE
-    
+
     // Fetch runes data from DDragon API to extract styles with specified locale
     const response = await fetch(getRunesDataUrl(locale))
 
@@ -15,9 +15,11 @@ export async function GET(request: NextRequest) {
     }
 
     const data = await response.json()
-    
+
     // Extract unique style names from all runes
-    const uniqueStyles = [...new Set(data.map((style: any) => style.name))].sort()
+    const uniqueStyles = [
+      ...new Set(data.map((style: any) => style.name)),
+    ].sort()
 
     return NextResponse.json(uniqueStyles)
   } catch (error) {

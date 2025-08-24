@@ -12,7 +12,7 @@ interface UseSpellsParams {
 
 export function useSpells(params: UseSpellsParams) {
   const { locale } = useLocale()
-  
+
   const spellsQuery = useQuery({
     queryKey: ['spells', locale, params.q, params.modes, params.page],
     queryFn: async () => {
@@ -21,7 +21,7 @@ export function useSpells(params: UseSpellsParams) {
         limit: params.limit,
         q: params.q,
         modes: params.modes,
-        locale
+        locale,
       })
     },
     staleTime: APP_CONFIG.CHAMPIONS_CACHE_TIME,

@@ -12,7 +12,7 @@ interface UseChampionsParams {
 
 export function useChampions(params: UseChampionsParams) {
   const { locale } = useLocale()
-  
+
   const championsQuery = useQuery({
     queryKey: ['champions', locale, params.q, params.tags, params.page],
     queryFn: async () => {
@@ -21,7 +21,7 @@ export function useChampions(params: UseChampionsParams) {
         limit: params.limit,
         q: params.q,
         tags: params.tags,
-        locale
+        locale,
       })
     },
     staleTime: APP_CONFIG.CHAMPIONS_CACHE_TIME,

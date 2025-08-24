@@ -5,4 +5,3 @@ export default function RootPage() {
   // Redirect to default locale (English)
   redirect(`/${LOCALE_CODES.EN}`)
 }
-

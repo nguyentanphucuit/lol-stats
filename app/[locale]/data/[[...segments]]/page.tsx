@@ -16,7 +16,13 @@ import { getTranslations } from '@/lib/translations'
 import { useLocale } from '@/components/providers/locale-provider'
 import { getLocaleCode } from '@/lib/locale-utils'
 
-type Section = 'champions' | 'items' | 'runes' | 'spells' | 'stat-perks' | 'runes-builds'
+type Section =
+  | 'champions'
+  | 'items'
+  | 'runes'
+  | 'spells'
+  | 'stat-perks'
+  | 'runes-builds'
 
 export default function DataPage() {
   const router = useRouter()
@@ -24,7 +30,7 @@ export default function DataPage() {
   const { locale } = useLocale()
   const translations = getTranslations(locale)
   const currentLocaleCode = getLocaleCode(locale)
-  
+
   // Determine active section from URL
   const getActiveSection = (): Section => {
     if (pathname.includes('/champions')) return 'champions'
@@ -35,54 +41,83 @@ export default function DataPage() {
     if (pathname.includes('/runes-builds')) return 'runes-builds'
     return 'champions' // default
   }
-  
+
   const activeSection = getActiveSection()
-  
-  const { 
-    params, 
-    updateSearch, 
-    updateTags, 
-    updatePage, 
-    clearFilters, 
-    toggleTag 
+
+  const {
+    params,
+    updateSearch,
+    updateTags,
+    updatePage,
+    clearFilters,
+    toggleTag,
   } = useParams()
 
   // Use all the hooks
-  const { champions, tags: championTags, isLoading: championsLoading, error: championsError } = useChampions({
+  const {
+    champions,
+    tags: championTags,
+    isLoading: championsLoading,
+    error: championsError,
+  } = useChampions({
     page: params.page,
     limit: params.limit,
     q: params.q,
-    tags: params.tags
+    tags: params.tags,
   })
 
-  const { items, tags: itemTags, isLoading: itemsLoading, error: itemsError } = useItems({
+  const {
+    items,
+    tags: itemTags,
+    isLoading: itemsLoading,
+    error: itemsError,
+  } = useItems({
     page: params.page,
     limit: params.limit,
     q: params.q,
-    tags: params.tags
+    tags: params.tags,
   })
 
-  const { runes, styles, isLoading: runesLoading, error: runesError } = useRunes({
+  const {
+    runes,
+    styles,
+    isLoading: runesLoading,
+    error: runesError,
+  } = useRunes({
     page: params.page,
     limit: params.limit,
     q: params.q,
-    styles: params.tags
+    styles: params.tags,
   })
 
-  const { spells, modes, isLoading: spellsLoading, error: spellsError } = useSpells({
+  const {
+    spells,
+    modes,
+    isLoading: spellsLoading,
+    error: spellsError,
+  } = useSpells({
     page: params.page,
     limit: params.limit,
     q: params.q,
-    modes: params.tags
+    modes: params.tags,
   })
 
-  const { statPerks, categories, isLoading: statPerksLoading, error: statPerksError } = useStatPerks({
+  const {
+    statPerks,
+    categories,
+    isLoading: statPerksLoading,
+    error: statPerksError,
+  } = useStatPerks({
     page: params.page,
     limit: params.limit,
-    q: params.q
+    q: params.q,
   })
 
-  const { runeTrees, isLoading: runeTreesLoading, error: runeTreesError } = useRuneTrees()
+  const {
+    runeTrees,
+    isLoading: runeTreesLoading,
+    error: runeTreesError,
+  } = useRuneTrees()
 
   const handleSectionChange = (section: Section) => {
     const newPath = `/${currentLocaleCode}/data/${section}`
@@ -97,49 +132,49 @@ export default function DataPage() {
           data: champions,
           tags: championTags || [],
           isLoading: championsLoading,
-          error: championsError
+          error: championsError,
         }
       case 'items':
         return {
           data: items,
           tags: itemTags || [],
           isLoading: itemsLoading,
-          error: itemsError
+          error: itemsError,
         }
       case 'runes':
         return {
           data: runes,
           tags: styles || [],
           isLoading: runesLoading,
-          error: runesError
+          error: runesError,
         }
       case 'spells':
         return {
           data: spells,
           tags: modes || [],
           isLoading: spellsLoading,
-          error: spellsError
+          error: spellsError,
         }
       case 'stat-perks':
         return {
           data: statPerks,
           tags: categories || [],
           isLoading: statPerksLoading,
-          error: statPerksError
+          error: statPerksError,
         }
       case 'runes-builds':
         return {
           data: { runeTrees },
           tags: [],
           isLoading: runeTreesLoading,
-          error: runeTreesError
+          error: runeTreesError,
         }
       default:
         return {
           data: null,
           tags: [],
           isLoading: false,
-          error: null
+          error: null,
         }
     }
   }
@@ -154,22 +189,22 @@ export default function DataPage() {
         return toggleTag
       case 'runes':
         return (tag: string) => {
-          const newTags = params.tags.includes(tag) 
-            ? params.tags.filter(t => t !== tag) 
+          const newTags = params.tags.includes(tag)
+            ? params.tags.filter(t => t !== tag)
             : [...params.tags, tag]
           updateTags(newTags)
         }
       case 'spells':
         return (tag: string) => {
-          const newTags = params.tags.includes(tag) 
-            ? params.tags.filter(t => t !== tag) 
+          const newTags = params.tags.includes(tag)
+            ? params.tags.filter(t => t !== tag)
             : [...params.tags, tag]
           updateTags(newTags)
         }
       case 'stat-perks':
         return (tag: string) => {
-          const newTags = params.tags.includes(tag) 
-            ? params.tags.filter(t => t !== tag) 
+          const newTags = params.tags.includes(tag)
+            ? params.tags.filter(t => t !== tag)
             : [...params.tags, tag]
           updateTags(newTags)
         }
@@ -187,48 +222,48 @@ export default function DataPage() {
       <div className="container mx-auto px-4 py-8">
         {/* Section Navigation */}
         <div className="flex flex-wrap justify-center gap-2">
-            <Button
-              variant={activeSection === 'champions' ? 'default' : 'outline'}
-              onClick={() => handleSectionChange('champions')}
-              className="min-w-[120px]"
-            >
-              {translations.navigation?.champions || 'Champions'}
-            </Button>
-            <Button
-              variant={activeSection === 'items' ? 'default' : 'outline'}
-              onClick={() => handleSectionChange('items')}
-              className="min-w-[120px]"
-            >
-              {translations.navigation?.items || 'Items'}
-            </Button>
-            <Button
-              variant={activeSection === 'runes' ? 'default' : 'outline'}
-              onClick={() => handleSectionChange('runes')}
-              className="min-w-[120px]"
-            >
-              {translations.navigation?.runes || 'Runes'}
-            </Button>
-            <Button
-              variant={activeSection === 'spells' ? 'default' : 'outline'}
-              onClick={() => handleSectionChange('spells')}
-              className="min-w-[120px]"
-            >
-              {translations.navigation?.spells || 'Spells'}
-            </Button>
-            <Button
-              variant={activeSection === 'stat-perks' ? 'default' : 'outline'}
-              onClick={() => handleSectionChange('stat-perks')}
-              className="min-w-[120px]"
-            >
-              Stat Perks
-            </Button>
-            <Button
-              variant={activeSection === 'runes-builds' ? 'default' : 'outline'}
-              onClick={() => handleSectionChange('runes-builds')}
-              className="min-w-[120px]"
-            >
-              Rune Trees
-            </Button>
+          <Button
+            variant={activeSection === 'champions' ? 'default' : 'outline'}
+            onClick={() => handleSectionChange('champions')}
+            className="min-w-[120px]"
+          >
+            {translations.navigation?.champions || 'Champions'}
+          </Button>
+          <Button
+            variant={activeSection === 'items' ? 'default' : 'outline'}
+            onClick={() => handleSectionChange('items')}
+            className="min-w-[120px]"
+          >
+            {translations.navigation?.items || 'Items'}
+          </Button>
+          <Button
+            variant={activeSection === 'runes' ? 'default' : 'outline'}
+            onClick={() => handleSectionChange('runes')}
+            className="min-w-[120px]"
+          >
+            {translations.navigation?.runes || 'Runes'}
+          </Button>
+          <Button
+            variant={activeSection === 'spells' ? 'default' : 'outline'}
+            onClick={() => handleSectionChange('spells')}
+            className="min-w-[120px]"
+          >
+            {translations.navigation?.spells || 'Spells'}
+          </Button>
+          <Button
+            variant={activeSection === 'stat-perks' ? 'default' : 'outline'}
+            onClick={() => handleSectionChange('stat-perks')}
+            className="min-w-[120px]"
+          >
+            Stat Perks
+          </Button>
+          <Button
+            variant={activeSection === 'runes-builds' ? 'default' : 'outline'}
+            onClick={() => handleSectionChange('runes-builds')}
+            className="min-w-[120px]"
+          >
+            Rune Trees
+          </Button>
         </div>
 
         {/* Unified Data Section Component */}

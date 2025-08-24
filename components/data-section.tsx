@@ -11,7 +11,13 @@ import { ItemsTable } from '@/components/items/items-table'
 import { RunesTable } from '@/components/runes/runes-table'
 import { SpellsTable } from '@/components/spells/spells-table'
 
-type Section = 'champions' | 'items' | 'runes' | 'spells' | 'stat-perks' | 'runes-builds'
+type Section =
+  | 'champions'
+  | 'items'
+  | 'runes'
+  | 'spells'
+  | 'stat-perks'
+  | 'runes-builds'
 
 interface DataSectionProps {
   section: Section
@@ -44,7 +50,7 @@ export function DataSection({
   currentPage,
   totalPages,
   onPageChange,
-  itemsPerPage
+  itemsPerPage,
 }: DataSectionProps) {
   if (error) {
     const errorMessages = {
@@ -53,43 +59,39 @@ export function DataSection({
       runes: 'Failed to load runes. Please try again later.',
       spells: 'Failed to load spells. Please try again later.',
       'stat-perks': 'Failed to load stat perks. Please try again later.',
-      'runes-builds': 'Failed to load rune trees. Please try again later.'
+      'runes-builds': 'Failed to load rune trees. Please try again later.',
     }
-    
-    return (
-      <DataError 
-        message={errorMessages[section]}
-        title="Error"
-      />
-    )
+
+    return <DataError message={errorMessages[section]} title="Error" />
   }
 
   const renderHeader = () => {
     const headerData = {
       champions: {
         title: 'Champions',
-        description: 'Explore the League of Legends champion roster'
+        description: 'Explore the League of Legends champion roster',
       },
       items: {
         title: 'Items',
-        description: 'Explore the League of Legends item shop'
+        description: 'Explore the League of Legends item shop',
       },
       runes: {
         title: 'Runes',
-        description: 'Customize your build with the rune system'
+        description: 'Customize your build with the rune system',
       },
       spells: {
         title: 'Spells',
-        description: 'Learn about spells and how to use them'
+        description: 'Learn about spells and how to use them',
       },
       'stat-perks': {
         title: 'Stat Perks',
-        description: 'Choose bonus stats to customize your champion'
+        description: 'Choose bonus stats to customize your champion',
       },
       'runes-builds': {
         title: 'Rune Trees',
-        description: 'Explore the complete rune tree structure with all slots and runes'
-      }
+        description:
+          'Explore the complete rune tree structure with all slots and runes',
+      },
     }
 
     const { title, description } = headerData[section]
@@ -101,37 +103,39 @@ export function DataSection({
       champions: {
         searchPlaceholder: 'Search champions...',
         tagLabel: 'Tags',
-        description: 'Find champions by name or filter by their roles and tags'
+        description: 'Find champions by name or filter by their roles and tags',
       },
       items: {
         searchPlaceholder: 'Search items...',
         tagLabel: 'Tags',
-        description: 'Find items by name or filter by their categories and tags'
+        description:
+          'Find items by name or filter by their categories and tags',
       },
       runes: {
         searchPlaceholder: 'Search runes...',
         tagLabel: 'Styles',
-        description: 'Find runes by name or filter by their styles'
+        description: 'Find runes by name or filter by their styles',
       },
       spells: {
         searchPlaceholder: 'Search spells...',
         tagLabel: 'Modes',
-        description: 'Find spells by name or filter by their game modes'
+        description: 'Find spells by name or filter by their game modes',
       },
       'stat-perks': {
         searchPlaceholder: 'Search stat perks...',
         tagLabel: 'Categories',
-        description: 'Find stat perks by name or filter by their categories'
+        description: 'Find stat perks by name or filter by their categories',
       },
       'runes-builds': {
         searchPlaceholder: 'Search rune trees...',
         tagLabel: 'Styles',
-        description: 'Explore the complete rune tree structure with all slots and runes'
-      }
+        description:
+          'Explore the complete rune tree structure with all slots and runes',
+      },
     }
 
     const { searchPlaceholder, tagLabel, description } = filterData[section]
-    
+
     return (
       <DataFilters
         searchQuery={searchQuery}
@@ -156,7 +160,7 @@ export function DataSection({
       runes: 'runes',
       spells: 'spells',
       'stat-perks': 'stat perks',
-      'runes-builds': 'rune trees'
+      'runes-builds': 'rune trees',
     }
 
     return (
@@ -170,7 +174,13 @@ export function DataSection({
   }
 
   const renderTable = () => {
-    const items = data?.[section] || data?.champions || data?.items || data?.runes || data?.spells || []
+    const items =
+      data?.[section] ||
+      data?.champions ||
+      data?.items ||
+      data?.runes ||
+      data?.spells ||
+      []
 
     switch (section) {
       case 'champions':
@@ -217,7 +227,8 @@ export function DataSection({
             Rune trees visualization will be implemented here
           </div>
         )
-      default: return null
+      default:
+        return null
     }
   }
 
@@ -239,9 +250,7 @@ export function DataSection({
       {renderFilters()}
       {renderResultsSummary()}
       <Card>
-        <CardContent className="p-0">
-          {renderTable()}
-        </CardContent>
+        <CardContent className="p-0">{renderTable()}</CardContent>
       </Card>
       {renderPagination()}
     </>

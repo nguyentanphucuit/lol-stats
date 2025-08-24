@@ -59,7 +59,8 @@ const translations: Record<string, Translations> = {
     },
     home: {
       title: 'Welcome to League Stats',
-      subtitle: 'Explore detailed information about Champions, Items, Runes and Spells in League of Legends',
+      subtitle:
+        'Explore detailed information about Champions, Items, Runes and Spells in League of Legends',
       champions: {
         title: 'Champions',
         description: 'Learn about champions and their abilities',
@@ -103,7 +104,8 @@ const translations: Record<string, Translations> = {
     },
     home: {
       title: 'Chào mừng đến với League Stats',
-      subtitle: 'Khám phá thông tin chi tiết về Champions, Items, Runes và Spells trong League of Legends',
+      subtitle:
+        'Khám phá thông tin chi tiết về Champions, Items, Runes và Spells trong League of Legends',
       champions: {
         title: 'Champions',
         description: 'Tìm hiểu về các tướng và khả năng của họ',
@@ -143,7 +145,7 @@ export function getTranslations(locale: string): Translations {
 export function t(locale: string, key: string): string {
   const keys = key.split('.')
   let value: any = getTranslations(locale)
-  
+
   for (const k of keys) {
     if (value && typeof value === 'object' && k in value) {
       value = value[k]
@@ -151,6 +153,6 @@ export function t(locale: string, key: string): string {
       return key // Return key if translation not found
     }
   }
-  
+
   return typeof value === 'string' ? value : key
 }
