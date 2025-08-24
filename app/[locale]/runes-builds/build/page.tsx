@@ -9,7 +9,9 @@ import { getLocaleCode } from "@/lib/locale-utils";
 import { useChampions } from "@/hooks/useChampions";
 import { useRuneTrees } from "@/hooks/useRuneTrees";
 import { useStatPerks } from "@/hooks/useStatPerks";
+import { useSpells } from "@/hooks/useSpells";
 import { runesService } from "@/lib/runes-service";
+import { spellsService } from "@/lib/spells-service";
 import Image from "next/image";
 import { ArrowLeft, Plus } from "lucide-react";
 import Link from "next/link";
@@ -20,6 +22,7 @@ import { SaveBuildModal } from "@/components/runes/save-build-modal";
 import { ChampionSection } from "@/components/champions/champion-section";
 import { ChampionSelectorModal } from "@/components/champions/champion-selector-modal";
 import { ItemsSelector, SelectedItem } from "@/components/items/items-selector";
+import { SpellsSelector } from "../../../../components/spells/spells-selector";
 import {
   ModeSelector,
   GAME_MODES,
@@ -48,6 +51,7 @@ export default function RuneBuilderPage() {
   const [selectedShards, setSelectedShards] = useState<SelectedShard[]>([]);
   const [selectedMode, setSelectedMode] = useState<GameMode | null>(null);
   const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([]);
+  const [selectedSpells, setSelectedSpells] = useState<any[]>([]);
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -62,6 +66,12 @@ export default function RuneBuilderPage() {
   const { statPerks, isLoading: statPerksLoading } = useStatPerks({
     page: 1,
     limit: 200, // Increased to fetch all stat perks
+  });
+
+  const { spells, isLoading: spellsLoading } = useSpells({
+    page: 1,
+    limit: 200,
+    q: "",
   });
 
   // Effects
@@ -146,6 +156,26 @@ export default function RuneBuilderPage() {
     );
   };
 
+  const handleSpellSelect = (spell: any, slotIndex: number) => {
+    const newSpell: any = {
+      id: spell.id,
+      name: spell.name,
+      icon: spellsService.getSpellImageUrl(spell.image.full), // Use spellsService to get proper image URL
+      slotIndex,
+    };
+
+    setSelectedSpells((prev) => {
+      const filtered = prev.filter((s) => s.slotIndex !== slotIndex);
+      return [...filtered, newSpell];
+    });
+  };
+
+  const handleSpellRemove = (slotIndex: number) => {
+    setSelectedSpells((prev) =>
+      prev.filter((spell) => spell.slotIndex !== slotIndex)
+    );
+  };
+
   const isBuildComplete = () => {
     // Check if we have all required selections
     if (
@@ -154,7 +184,8 @@ export default function RuneBuilderPage() {
       !selectedSecondaryTree ||
       selectedRunes.length === 0 ||
       selectedShards.length === 0 ||
-      selectedItems.length < 6
+      selectedItems.length < 6 ||
+      selectedSpells.length < 1
     ) {
       return false;
     }
@@ -182,6 +213,11 @@ export default function RuneBuilderPage() {
 
     // Check if we have all 6 items
     if (selectedItems.length < 6) {
+      return false;
+    }
+
+    // Check if we have exactly 2 spells
+    if (selectedSpells.length < 2) {
       return false;
     }
 
@@ -244,6 +280,12 @@ export default function RuneBuilderPage() {
           .map((item) => ({
             ...item,
             id: item.id?.toString() || String(item.id), // Safe conversion with fallback
+          })),
+        selectedSpells: selectedSpells
+          .sort((a, b) => a.slotIndex - b.slotIndex)
+          .map((spell) => ({
+            ...spell,
+            id: spell.id?.toString() || String(spell.id), // Safe conversion with fallback
           })),
       };
 
@@ -375,11 +417,11 @@ export default function RuneBuilderPage() {
                   <CardTitle>Rune Build</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {runeTreesLoading || statPerksLoading ? (
+                  {runeTreesLoading || statPerksLoading || spellsLoading ? (
                     <div className="text-center py-8">
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
                       <p className="mt-2 text-gray-600">
-                        Loading rune trees...
+                        Loading rune trees, stat perks, or spells...
                       </p>
                     </div>
                   ) : (
@@ -416,12 +458,20 @@ export default function RuneBuilderPage() {
                   )}
                 </CardContent>
               </Card>
-              {/* Items Selector */}
-              <ItemsSelector
-                selectedItems={selectedItems}
-                onItemSelect={handleItemSelect}
-                onItemRemove={handleItemRemove}
-              />
+              <div className="flex flex-col gap-4">
+                {/* Items Selector */}
+                <ItemsSelector
+                  selectedItems={selectedItems}
+                  onItemSelect={handleItemSelect}
+                  onItemRemove={handleItemRemove}
+                />
+                {/* Spells Selector */}
+                <SpellsSelector
+                  selectedSpells={selectedSpells}
+                  onSpellSelect={handleSpellSelect}
+                  onSpellRemove={handleSpellRemove}
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -441,8 +491,8 @@ export default function RuneBuilderPage() {
           </Button>
           {!isBuildComplete() && (
             <p className="text-sm text-gray-500 mt-2">
-              Select game mode, champion, all required runes, shards, and items
-              to enable save
+              Select game mode, champion, all required runes, shards, items, and
+              spells to enable save
             </p>
           )}
         </div>
@@ -467,6 +517,7 @@ export default function RuneBuilderPage() {
             selectedRunes: selectedRunes,
             selectedShards: selectedShards,
             selectedItems: selectedItems,
+            selectedSpells: selectedSpells,
           }}
           onConfirm={handleConfirmSave}
           onCancel={() => setShowSaveModal(false)}

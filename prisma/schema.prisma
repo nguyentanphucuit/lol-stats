@@ -32,6 +32,7 @@ model RuneBuild {
   secondaryRunes    Json
   statShards        Json
   selectedItems     Json     @default("[]")
+  selectedSpells    Json     @default("[]")
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 

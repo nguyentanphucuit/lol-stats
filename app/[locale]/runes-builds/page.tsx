@@ -88,6 +88,12 @@ export default function RunesBuildsPage() {
           ) ||
           build.statShards.some((shard) =>
             shard.name?.toLowerCase().includes(searchLower)
+          ) ||
+          build.selectedItems?.some((item) =>
+            item.name?.toLowerCase().includes(searchLower)
+          ) ||
+          build.selectedSpells?.some((spell) =>
+            spell.name?.toLowerCase().includes(searchLower)
           );
 
         if (!matchesSearch) return false;
@@ -387,6 +393,7 @@ export default function RunesBuildsPage() {
                         <TableHead>Secondary Runes</TableHead>
                         <TableHead>Stat Shards</TableHead>
                         <TableHead>Items</TableHead>
+                        <TableHead>Spells</TableHead>
                         <TableHead>Created</TableHead>
                         <TableHead>Actions</TableHead>
                       </TableRow>
@@ -732,6 +739,86 @@ export default function RunesBuildsPage() {
                               ) : (
                                 <span className="text-gray-400 text-xs">
                                   No items
+                                </span>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex flex-wrap gap-1">
+                              {build.selectedSpells &&
+                              build.selectedSpells.length > 0 ? (
+                                build.selectedSpells.map((spell, index) => (
+                                  <Tooltip key={index}>
+                                    <TooltipTrigger asChild>
+                                      <div className="w-8 h-8 relative flex-shrink-0 rounded bg-gray-200 dark:bg-gray-700 flex items-center justify-center cursor-help hover:scale-110 transition-transform duration-200">
+                                        {spell.icon ? (
+                                          <Image
+                                            src={spell.icon}
+                                            alt={
+                                              spell.name || `Spell ${index + 1}`
+                                            }
+                                            width={32}
+                                            height={32}
+                                            className="rounded object-cover"
+                                            onError={(e) => {
+                                              const target =
+                                                e.currentTarget as HTMLImageElement;
+                                              target.style.display = "none";
+                                              const parent =
+                                                target.parentElement;
+                                              if (parent) {
+                                                parent.innerHTML = `<span class="text-gray-500 dark:text-gray-400 font-medium text-xs">${(spell.name || `S${index + 1}`).charAt(0)}</span>`;
+                                              }
+                                            }}
+                                          />
+                                        ) : (
+                                          <span className="text-gray-500 dark:text-gray-400 font-medium text-xs">
+                                            {spell.name
+                                              ? spell.name.charAt(0)
+                                              : `S${index + 1}`}
+                                          </span>
+                                        )}
+                                      </div>
+                                    </TooltipTrigger>
+                                    <TooltipContent
+                                      side="top"
+                                      className="max-w-sm"
+                                    >
+                                      <div className="space-y-2">
+                                        <div className="flex items-center gap-2">
+                                          {spell.icon && (
+                                            <div className="w-5 h-5 relative">
+                                              <Image
+                                                src={spell.icon}
+                                                alt={
+                                                  spell.name ||
+                                                  `Spell ${index + 1}`
+                                                }
+                                                width={20}
+                                                height={20}
+                                                className="rounded object-cover"
+                                              />
+                                            </div>
+                                          )}
+                                          <p className="font-bold text-blue-600 dark:text-blue-400">
+                                            {spell.name || `Spell ${index + 1}`}
+                                          </p>
+                                        </div>
+                                        <div className="border-t border-gray-200 dark:border-gray-600 pt-2">
+                                          <p className="text-sm text-gray-700 dark:text-gray-300">
+                                            Slot:{" "}
+                                            {spell.slotIndex !== undefined
+                                              ? spell.slotIndex + 1
+                                              : index + 1}
+                                          </p>
+                                        </div>
+                                      </div>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                ))
+                              ) : (
+                                <span className="text-gray-400 text-xs">
+                                  No spells
                                 </span>
                               )}
                             </div>

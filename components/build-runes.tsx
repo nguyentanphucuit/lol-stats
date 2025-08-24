@@ -1,29 +1,29 @@
-'use client'
+"use client";
 
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface RuneSlot {
-  name: string
-  description?: string
+  name: string;
+  description?: string;
 }
 
 interface RunePath {
-  name: string
-  keystone: string
-  slots: RuneSlot[]
+  name: string;
+  keystone: string;
+  slots: RuneSlot[];
 }
 
 interface BuildRunesProps {
-  primary: RunePath
-  secondary: RunePath
-  className?: string
+  primary: RunePath;
+  secondary: RunePath;
+  className?: string;
 }
 
 export function BuildRunes({
   primary,
   secondary,
-  className = '',
+  className = "",
 }: BuildRunesProps) {
   return (
     <div className={`space-y-4 ${className}`}>
@@ -103,5 +103,5 @@ export function BuildRunes({
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

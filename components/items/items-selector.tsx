@@ -80,18 +80,17 @@ export function ItemsSelector({
         </CardHeader>
         <CardContent>
           {/* Item Slots */}
-          <div className="grid grid-cols-6 gap-3 mb-4">
+          <div className="grid grid-cols-6 gap-2 mb-2">
             {Array.from({ length: 6 }).map((_, index) => {
               const item = getItemSlot(index);
               return (
-                <div className="flex flex-col gap-2">
+                <div key={`slot-${index}`} className="flex flex-col gap-2">
                   <div className="flex items-center gap-2 justify-center">
                     <p className="text-xs text-gray-500 dark:text-gray-400">
                       {getSlotLabel(index)}
                     </p>
                   </div>
                   <div
-                    key={`slot-${index}`}
                     className={`relative border-2 rounded-lg p-3 cursor-pointer transition-all ${
                       item
                         ? "border-green-500 bg-green-50 dark:bg-green-900/20"
@@ -167,15 +166,13 @@ export function ItemsSelector({
           </div>
 
           {/* Total Gold Display */}
-          <div className="flex justify-center mb-4">
-            <div className="bg-gray-100 dark:bg-gray-800 px-4 py-2 rounded-lg">
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Total Cost:{" "}
-              </span>
-              <span className="text-lg font-bold text-yellow-600 dark:text-yellow-400">
-                {calculateTotalGold().toLocaleString()} gold
-              </span>
-            </div>
+          <div className="flex justify-end">
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Total Cost:{" "}
+            </span>
+            <span className="text-sm font-bold text-yellow-600 dark:text-yellow-400">
+              {calculateTotalGold().toLocaleString()} gold
+            </span>
           </div>
 
           {/* Item List Modal */}

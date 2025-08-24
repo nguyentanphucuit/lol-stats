@@ -12,6 +12,7 @@ export interface RuneBuildData {
   secondaryRunes: any[]
   statShards: any[]
   selectedItems: any[]
+  selectedSpells: any[]
 }
 
 export class RuneBuildsService {
@@ -33,6 +34,7 @@ export class RuneBuildsService {
           secondaryRunes: buildData.secondaryRunes,
           statShards: buildData.statShards,
           selectedItems: buildData.selectedItems,
+          selectedSpells: buildData.selectedSpells,
         },
       })
       
