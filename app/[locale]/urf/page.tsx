@@ -24,33 +24,6 @@ export default function UrfPage() {
             </p>
           </CardHeader>
         </Card>
-
-        <Card className="mb-6">
-          <CardContent className="p-6">
-            <div className="text-center">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                🚀 Use URF Builds as Templates
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-4">
-                Click "Create New Build" on any champion below to use their URF
-                build as a starting point. You can then customize runes, items,
-                and spells to create your perfect build!
-              </p>
-              <div className="flex flex-wrap justify-center gap-2 text-sm">
-                <Badge variant="outline">Runes</Badge>
-                <Badge variant="outline">Items</Badge>
-                <Badge variant="outline">Spells</Badge>
-                <Badge variant="outline">Customizable</Badge>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <div className="text-center">
-          <p className="text-gray-600 dark:text-gray-400">
-            URF builds configuration loaded. Ready to create new builds!
-          </p>
-        </div>
       </div>
     </div>
   );
