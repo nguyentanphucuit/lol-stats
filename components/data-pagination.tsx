@@ -1,19 +1,12 @@
-'use client'
+"use client";
 
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from '@/components/ui/pagination'
-import { APP_CONFIG } from '@/lib/constants'
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface DataPaginationProps {
-  currentPage: number
-  totalPages: number
-  onPageChange: (page: number) => void
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
 }
 
 export function DataPagination({
@@ -21,152 +14,84 @@ export function DataPagination({
   totalPages,
   onPageChange,
 }: DataPaginationProps) {
-  const maxVisible = APP_CONFIG.MAX_VISIBLE_PAGES
+  return (
+    <div className="flex justify-center items-center gap-2">
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => onPageChange(currentPage - 1)}
+        disabled={currentPage === 1}
+        className="flex items-center gap-1"
+      >
+        <ChevronLeft className="w-4 h-4" />
+        Previous
+      </Button>
 
-  // Calculate which pages to show
-  const calculatePageRange = () => {
-    let startPage = 1
-    let endPage = Math.min(maxVisible, totalPages)
+      <div className="flex gap-1">
+        <Button
+          key={1}
+          variant={currentPage === 1 ? "default" : "outline"}
+          size="sm"
+          onClick={() => onPageChange(1)}
+          className="w-8 h-8 p-0"
+        >
+          1
+        </Button>
 
-    // If we're near the end, show pages from the end
-    if (currentPage > totalPages - Math.floor(maxVisible / 2)) {
-      startPage = Math.max(1, totalPages - maxVisible + 1)
-      endPage = totalPages
-    }
-    // If we're near the beginning, show pages from the beginning
-    else if (currentPage < Math.ceil(maxVisible / 2)) {
-      startPage = 1
-      endPage = Math.min(maxVisible, totalPages)
-    }
-    // If we're in the middle, center around current page
-    else {
-      startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2))
-      endPage = Math.min(totalPages, startPage + maxVisible - 1)
-    }
+        {currentPage > 4 && (
+          <span className="flex items-center px-2 text-gray-500">...</span>
+        )}
 
-    return { startPage, endPage }
-  }
+        {Array.from({ length: totalPages }, (_, i) => {
+          const pageNum = i + 1;
+          if (
+            pageNum > 1 &&
+            pageNum < totalPages &&
+            pageNum >= currentPage - 2 &&
+            pageNum <= currentPage + 2
+          ) {
+            return (
+              <Button
+                key={pageNum}
+                variant={currentPage === pageNum ? "default" : "outline"}
+                size="sm"
+                onClick={() => onPageChange(pageNum)}
+                className="w-8 h-8 p-0"
+              >
+                {pageNum}
+              </Button>
+            );
+          }
+          return null;
+        })}
 
-  const renderPageNumbers = () => {
-    const { startPage, endPage } = calculatePageRange()
-    const pages = []
+        {currentPage < totalPages - 3 && (
+          <span className="flex items-center px-2 text-gray-500">...</span>
+        )}
 
-    // Add first page if not in range
-    if (startPage > 1) {
-      pages.push(
-        <PaginationItem key={1}>
-          <PaginationLink
-            href="#"
-            onClick={e => {
-              e.preventDefault()
-              onPageChange(1)
-            }}
-          >
-            1
-          </PaginationLink>
-        </PaginationItem>
-      )
-
-      // Add ellipsis if there's a gap
-      if (startPage > 2) {
-        pages.push(
-          <PaginationItem key="ellipsis-start">
-            <span className="px-2 py-2 text-sm text-gray-500">...</span>
-          </PaginationItem>
-        )
-      }
-    }
-
-    // Add visible page range
-    for (let i = startPage; i <= endPage; i++) {
-      pages.push(
-        <PaginationItem key={i}>
-          <PaginationLink
-            href="#"
-            onClick={e => {
-              e.preventDefault()
-              onPageChange(i)
-            }}
-            isActive={currentPage === i}
-          >
-            {i}
-          </PaginationLink>
-        </PaginationItem>
-      )
-    }
-
-    // Add last page if not in range
-    if (endPage < totalPages) {
-      // Add ellipsis if there's a gap
-      if (endPage < totalPages - 1) {
-        pages.push(
-          <PaginationItem key="ellipsis-end">
-            <span className="px-2 py-2 text-sm text-gray-500">...</span>
-          </PaginationItem>
-        )
-      }
-
-      pages.push(
-        <PaginationItem key={totalPages}>
-          <PaginationLink
-            href="#"
-            onClick={e => {
-              e.preventDefault()
-              onPageChange(totalPages)
-            }}
+        {totalPages > 1 && (
+          <Button
+            key={totalPages}
+            variant={currentPage === totalPages ? "default" : "outline"}
+            size="sm"
+            onClick={() => onPageChange(totalPages)}
+            className="w-8 h-8 p-0"
           >
             {totalPages}
-          </PaginationLink>
-        </PaginationItem>
-      )
-    }
+          </Button>
+        )}
+      </div>
 
-    return pages
-  }
-
-  const handlePreviousPage = (e: React.MouseEvent) => {
-    e.preventDefault()
-    if (currentPage > 1) {
-      onPageChange(currentPage - 1)
-    }
-  }
-
-  const handleNextPage = (e: React.MouseEvent) => {
-    e.preventDefault()
-    if (currentPage < totalPages) {
-      onPageChange(currentPage + 1)
-    }
-  }
-
-  return (
-    <div className="mt-6">
-      <Pagination>
-        <PaginationContent>
-          <PaginationItem>
-            <PaginationPrevious
-              href="#"
-              onClick={handlePreviousPage}
-              className={
-                currentPage === 1 ? 'pointer-events-none opacity-50' : ''
-              }
-            />
-          </PaginationItem>
-
-          {renderPageNumbers()}
-
-          <PaginationItem>
-            <PaginationNext
-              href="#"
-              onClick={handleNextPage}
-              className={
-                currentPage === totalPages
-                  ? 'pointer-events-none opacity-50'
-                  : ''
-              }
-            />
-          </PaginationItem>
-        </PaginationContent>
-      </Pagination>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => onPageChange(currentPage + 1)}
+        disabled={currentPage === totalPages}
+        className="flex items-center gap-1"
+      >
+        Next
+        <ChevronRight className="w-4 h-4" />
+      </Button>
     </div>
-  )
+  );
 }

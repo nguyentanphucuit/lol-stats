@@ -18,6 +18,7 @@ import { SpellDisplay } from "@/components/spells/spell-display";
 import { ItemsDisplay } from "@/components/items/items-display";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { DataPagination } from "@/components/data-pagination";
 
 export default function UrfPage() {
   const { locale } = useLocale();
@@ -26,6 +27,10 @@ export default function UrfPage() {
 
   // Search state
   const [searchQuery, setSearchQuery] = useState("");
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const buildsPerPage = 5;
 
   // Fetch URF builds data
   const { urfBuilds, isLoading, error } = useUrfBuilds();
@@ -36,6 +41,25 @@ export default function UrfPage() {
       build.championName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       build.championKey?.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredBuilds.length / buildsPerPage);
+  const startIndex = (currentPage - 1) * buildsPerPage;
+  const endIndex = startIndex + buildsPerPage;
+  const currentBuilds = filteredBuilds.slice(startIndex, endIndex);
+
+  // Reset to first page when search changes
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
+    setCurrentPage(1);
+  };
+
+  // Handle page change
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    // Scroll to top when page changes
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   // Fetch required data for RuneBuildSection
   const { runeTrees, isLoading: runeTreesLoading } = useRuneTrees();
@@ -69,14 +93,14 @@ export default function UrfPage() {
                     type="text"
                     placeholder="Type champion name (e.g., Aatrox, Yasuo)..."
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={(e) => handleSearchChange(e.target.value)}
                     className="flex-1 text-center text-lg py-3 border-2 border-blue-200 dark:border-blue-800 focus:border-blue-500 dark:focus:border-blue-400"
                   />
                   {searchQuery && (
                     <Button
                       variant="outline"
                       size="default"
-                      onClick={() => setSearchQuery("")}
+                      onClick={() => handleSearchChange("")}
                       className="px-6 py-3 border-2 border-red-200 dark:border-red-800 hover:bg-red-50 dark:hover:bg-red-950"
                     >
                       ✕ Clear
@@ -87,9 +111,21 @@ export default function UrfPage() {
             </CardContent>
           </Card>
 
+          {/* Results Summary */}
+          {filteredBuilds.length > 0 && (
+            <div className="text-center mb-6">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Showing {startIndex + 1}-
+                {Math.min(endIndex, filteredBuilds.length)} of{" "}
+                {filteredBuilds.length} URF builds
+                {searchQuery && ` matching "${searchQuery}"`}
+              </p>
+            </div>
+          )}
+
           {/* Display URF builds */}
           <div className="space-y-8">
-            {filteredBuilds.map((build, index) => (
+            {currentBuilds.map((build, index) => (
               <Card key={`urf-build-${index}`} className="overflow-hidden">
                 <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950 dark:to-purple-950 border-b">
                   <div className="flex items-center justify-between">
@@ -116,7 +152,7 @@ export default function UrfPage() {
                           {build.championName || "Unknown Champion"}
                         </h3>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
-                          URF Build #{index + 1}
+                          URF Build #{startIndex + index + 1}
                         </p>
                       </div>
                     </div>
@@ -147,14 +183,14 @@ export default function UrfPage() {
                           ) || null
                         }
                         selectedRunes={
-                          filteredBuilds?.[index]
+                          currentBuilds?.[index]
                             ? [
                                 ...(build.primaryRunes || []),
                                 ...(build.secondaryRunes || []),
                               ]
                             : []
                         }
-                        selectedShards={filteredBuilds[index]?.statShards || []}
+                        selectedShards={currentBuilds[index]?.statShards || []}
                         runeTreesLoading={runeTreesLoading}
                         statPerksLoading={statPerksLoading}
                         spellsLoading={spellsLoading}
@@ -189,6 +225,17 @@ export default function UrfPage() {
               </Card>
             ))}
           </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="mt-8">
+              <DataPagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
+            </div>
+          )}
 
           {/* Show message if no URF builds or no search results */}
           {!isLoading && !error && (

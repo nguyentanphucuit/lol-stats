@@ -46,6 +46,7 @@ import Image from "next/image";
 import { runesService } from "@/lib/runes-service";
 import { LEAGUE_CONFIG } from "@/lib/league-config";
 import { useState, useMemo } from "react";
+import { DataPagination } from "@/components/data-pagination";
 
 export default function RunesBuildsPage() {
   const { locale } = useLocale();
@@ -58,6 +59,10 @@ export default function RunesBuildsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedChampions, setSelectedChampions] = useState<string[]>([]);
   const [selectedGameModes, setSelectedGameModes] = useState<string[]>([]);
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const buildsPerPage = 10;
 
   // Delete states
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -135,6 +140,24 @@ export default function RunesBuildsPage() {
     });
   }, [runeBuilds, searchTerm, selectedChampions, selectedGameModes]);
 
+  // Pagination logic
+  const totalPages = Math.ceil(filteredBuilds.length / buildsPerPage);
+  const startIndex = (currentPage - 1) * buildsPerPage;
+  const endIndex = startIndex + buildsPerPage;
+  const currentBuilds = filteredBuilds.slice(startIndex, endIndex);
+
+  // Reset to first page when filters change
+  const resetPagination = () => {
+    setCurrentPage(1);
+  };
+
+  // Handle page change
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    // Scroll to top when page changes
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   // Check if there are active filters
   const hasActiveFilters =
     searchTerm || selectedChampions.length > 0 || selectedGameModes.length > 0;
@@ -160,6 +183,7 @@ export default function RunesBuildsPage() {
     setSearchTerm("");
     setSelectedChampions([]);
     setSelectedGameModes([]);
+    resetPagination();
   };
 
   // Delete functions
@@ -292,7 +316,10 @@ export default function RunesBuildsPage() {
                   <Input
                     placeholder="Search builds, champions, runes, or game modes..."
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onChange={(e) => {
+                      setSearchTerm(e.target.value);
+                      resetPagination();
+                    }}
                     className="pl-10"
                   />
                 </div>
@@ -405,7 +432,11 @@ export default function RunesBuildsPage() {
               <div className="flex items-center justify-between">
                 <CardTitle className="text-xl">Saved Rune Builds</CardTitle>
                 <div className="text-sm text-gray-600 dark:text-gray-400">
-                  Showing {filteredBuilds.length} of {runeBuilds.length} builds
+                  Showing {startIndex + 1}-
+                  {Math.min(endIndex, filteredBuilds.length)} of{" "}
+                  {filteredBuilds.length} builds
+                  {runeBuilds.length !== filteredBuilds.length &&
+                    ` (${runeBuilds.length} total)`}
                 </div>
               </div>
             </CardHeader>
@@ -453,7 +484,7 @@ export default function RunesBuildsPage() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {filteredBuilds.map((build) => (
+                      {currentBuilds.map((build) => (
                         <TableRow key={build.id}>
                           <TableCell>
                             <Tooltip>
@@ -1001,20 +1032,19 @@ export default function RunesBuildsPage() {
                   </Table>
                 </div>
               )}
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+                  <DataPagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                  />
+                </div>
+              )}
             </CardContent>
           </Card>
-
-          {/* Summary */}
-          {filteredBuilds.length > 0 && (
-            <div className="mt-6 text-center">
-              <p className="text-gray-600 dark:text-gray-400">
-                Showing {filteredBuilds.length} of {runeBuilds.length} rune
-                build
-                {runeBuilds.length !== 1 ? "s" : ""}
-                {hasActiveFilters && " (filtered)"}
-              </p>
-            </div>
-          )}
         </div>
       </div>
 
