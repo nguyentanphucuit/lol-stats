@@ -115,6 +115,25 @@ export class RuneBuildsService {
   }
 
   /**
+   * Get rune builds by game mode
+   */
+  static async getBuildsByMode(gameMode: string) {
+    try {
+      return await prisma.runeBuild.findMany({
+        where: { gameMode },
+        select: {
+          championKey: true,
+          championName: true,
+          gameMode: true,
+        },
+        orderBy: { createdAt: 'desc' },
+      })
+    } catch (error) {
+      throw new Error('Failed to fetch rune builds by mode')
+    }
+  }
+
+  /**
    * Delete a rune build
    */
   static async deleteBuild(id: string) {

@@ -543,6 +543,7 @@ export default function RuneBuilderPage() {
           championsLoading={championsLoading}
           onChampionSelect={handleChampionSelect}
           onClose={() => setShowChampionSelector(false)}
+          selectedMode={selectedMode?.id || null}
         />
 
         {/* Save Build Modal */}

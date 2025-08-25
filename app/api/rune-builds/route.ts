@@ -1,8 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { RuneBuildsService, RuneBuildData } from '@/lib/rune-builds-service';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const { searchParams } = new URL(request.url);
+    const mode = searchParams.get('mode');
+    
+    if (mode) {
+      // Get builds by specific mode
+      const buildsByMode = await RuneBuildsService.getBuildsByMode(mode);
+      return NextResponse.json(buildsByMode);
+    }
+    
+    // Get all builds if no mode specified
     const runeBuilds = await RuneBuildsService.getAllBuilds();
     return NextResponse.json(runeBuilds);
   } catch (error) {
