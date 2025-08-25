@@ -72,17 +72,57 @@ export function SaveBuildModal({
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Left Column - Basic Info */}
             <div className="space-y-4">
+              {/* Champion */}
+              {champion && (
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 relative rounded-lg overflow-hidden">
+                        <Image
+                          src={champion.image}
+                          alt={champion.name}
+                          width={48}
+                          height={48}
+                          className="object-cover"
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-medium text-sm">{champion.name}</h3>
+                        <p className="text-xs text-gray-500 truncate">
+                          {champion.title}
+                        </p>
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {champion.tags?.slice(0, 2).map((tag, index) => (
+                            <Badge
+                              key={`tag-${tag}-${index}`}
+                              variant="secondary"
+                              className="text-xs px-1.5 py-0.5"
+                            >
+                              {tag}
+                            </Badge>
+                          ))}
+                          {champion.tags && champion.tags.length > 2 && (
+                            <Badge
+                              variant="outline"
+                              className="text-xs px-1.5 py-0.5"
+                            >
+                              +{champion.tags.length - 2}
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
               {/* Game Mode */}
               <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-lg">Game Mode</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center gap-3">
-                    <span className="text-2xl">{gameMode?.icon}</span>
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">{gameMode?.icon}</span>
                     <div>
-                      <h3 className="font-medium">{gameMode?.name}</h3>
-                      <p className="text-sm text-gray-500">
+                      <h3 className="font-medium text-sm">{gameMode?.name}</h3>
+                      <p className="text-xs text-gray-500 truncate max-w-[200px]">
                         {gameMode?.description}
                       </p>
                     </div>
@@ -90,65 +130,23 @@ export function SaveBuildModal({
                 </CardContent>
               </Card>
 
-              {/* Champion */}
-              {champion && (
-                <Card>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-lg">Champion</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center gap-3">
-                      <div className="w-16 h-16 relative rounded-lg overflow-hidden">
-                        <Image
-                          src={champion.image}
-                          alt={champion.name}
-                          width={64}
-                          height={64}
-                          className="object-cover"
-                        />
-                      </div>
-                      <div>
-                        <h3 className="font-medium">{champion.name}</h3>
-                        <p className="text-sm text-gray-500">
-                          {champion.title}
-                        </p>
-                        <div className="flex flex-wrap gap-1 mt-1">
-                          {champion.tags?.map((tag, index) => (
-                            <Badge
-                              key={`tag-${tag}-${index}`}
-                              variant="secondary"
-                              className="text-xs"
-                            >
-                              {tag}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-
               {/* Summoner Spells */}
               {selectedSpells.length > 0 && (
                 <Card>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-lg">Summoner Spells</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-2 gap-3">
+                  <CardContent className="p-4">
+                    <div className="grid grid-cols-2 gap-2">
                       {selectedSpells
                         .sort((a, b) => a.slotIndex - b.slotIndex)
                         .map((spell, index) => (
                           <div
                             key={`spell-${spell.id || spell.slotIndex || index}`}
-                            className="flex items-center gap-2 p-2 border rounded"
+                            className="flex items-center gap-2 p-1.5 border rounded"
                           >
                             <Image
                               src={spell.icon}
                               alt={spell.name}
-                              width={32}
-                              height={32}
+                              width={24}
+                              height={24}
                               className="rounded object-cover"
                               onError={(e) => {
                                 const target =
@@ -161,7 +159,7 @@ export function SaveBuildModal({
                               }}
                             />
                             <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium truncate">
+                              <p className="text-xs font-medium truncate">
                                 {spell.name}
                               </p>
                             </div>
@@ -178,12 +176,7 @@ export function SaveBuildModal({
               {/* Primary Tree */}
               {primaryTree && (
                 <Card>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-lg">
-                      Primary Tree: {primaryTree.name}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
+                  <CardContent className="p-4">
                     <div className="space-y-2">
                       {primaryRunes.map((rune, index) => (
                         <div
@@ -193,12 +186,15 @@ export function SaveBuildModal({
                           <Image
                             src={runesService.getRuneImageUrl(rune.icon)}
                             alt={rune.name}
-                            width={24}
-                            height={24}
+                            width={20}
+                            height={20}
                             className="rounded"
                           />
-                          <span className="text-sm">{rune.name}</span>
-                          <Badge variant="outline" className="text-xs">
+                          <span className="text-xs flex-1">{rune.name}</span>
+                          <Badge
+                            variant="outline"
+                            className="text-xs px-1.5 py-0.5"
+                          >
                             Slot {rune.slotNumber}
                           </Badge>
                         </div>
@@ -211,12 +207,7 @@ export function SaveBuildModal({
               {/* Secondary Tree */}
               {secondaryTree && (
                 <Card>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-lg">
-                      Secondary Tree: {secondaryTree.name}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
+                  <CardContent className="p-4">
                     <div className="space-y-2">
                       {secondaryRunes.map((rune, index) => (
                         <div
@@ -226,12 +217,15 @@ export function SaveBuildModal({
                           <Image
                             src={runesService.getRuneImageUrl(rune.icon)}
                             alt={rune.name}
-                            width={24}
-                            height={24}
+                            width={20}
+                            height={20}
                             className="rounded"
                           />
-                          <span className="text-sm">{rune.name}</span>
-                          <Badge variant="outline" className="text-xs">
+                          <span className="text-xs flex-1">{rune.name}</span>
+                          <Badge
+                            variant="outline"
+                            className="text-xs px-1.5 py-0.5"
+                          >
                             Slot {rune.slotNumber}
                           </Badge>
                         </div>
@@ -244,10 +238,7 @@ export function SaveBuildModal({
               {/* Stat Shards */}
               {selectedShards.length > 0 && (
                 <Card>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-lg">Stat Shards</CardTitle>
-                  </CardHeader>
-                  <CardContent>
+                  <CardContent className="p-4">
                     <div className="space-y-2">
                       {selectedShards.map((shard, index) => (
                         <div
@@ -257,12 +248,15 @@ export function SaveBuildModal({
                           <Image
                             src={shard.icon}
                             alt={shard.name}
-                            width={24}
-                            height={24}
+                            width={20}
+                            height={20}
                             className="rounded"
                           />
-                          <span className="text-sm">{shard.name}</span>
-                          <Badge variant="outline" className="text-xs">
+                          <span className="text-xs flex-1">{shard.name}</span>
+                          <Badge
+                            variant="outline"
+                            className="text-xs px-1.5 py-0.5"
+                          >
                             {shard.category}
                           </Badge>
                         </div>
@@ -276,24 +270,21 @@ export function SaveBuildModal({
 
           {/* Items Display */}
           {selectedItems1.length > 0 && (
-            <Card className="mt-6">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg">Item Build 1</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            <Card className="mt-4">
+              <CardContent className="p-4">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                   {selectedItems1
                     .sort((a, b) => a.slotIndex - b.slotIndex)
                     .map((item, index) => (
                       <div
                         key={`item-${item.id || item.slotIndex || index}`}
-                        className="flex items-center gap-2 p-2 border rounded"
+                        className="flex items-center gap-2 p-1.5 border rounded"
                       >
                         <Image
                           src={item.icon}
                           alt={item.name}
-                          width={32}
-                          height={32}
+                          width={24}
+                          height={24}
                           className="rounded object-cover"
                           onError={(e) => {
                             const target = e.currentTarget as HTMLImageElement;
@@ -305,7 +296,7 @@ export function SaveBuildModal({
                           }}
                         />
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium truncate">
+                          <p className="text-xs font-medium truncate">
                             {item.name}
                           </p>
                           <p className="text-xs text-gray-500">
@@ -321,24 +312,21 @@ export function SaveBuildModal({
 
           {/* Items Build 2 Display */}
           {selectedItems2.length > 0 && (
-            <Card className="mt-6">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg">Item Build 2</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            <Card className="mt-4">
+              <CardContent className="p-4">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                   {selectedItems2
                     .sort((a, b) => a.slotIndex - b.slotIndex)
                     .map((item, index) => (
                       <div
                         key={`item2-${item.id || item.slotIndex || index}`}
-                        className="flex items-center gap-2 p-2 border rounded"
+                        className="flex items-center gap-2 p-1.5 border rounded"
                       >
                         <Image
                           src={item.icon}
                           alt={item.name}
-                          width={32}
-                          height={32}
+                          width={24}
+                          height={24}
                           className="rounded object-cover"
                           onError={(e) => {
                             const target = e.currentTarget as HTMLImageElement;
@@ -350,7 +338,7 @@ export function SaveBuildModal({
                           }}
                         />
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium truncate">
+                          <p className="text-xs font-medium truncate">
                             {item.name}
                           </p>
                           <p className="text-xs text-gray-500">
