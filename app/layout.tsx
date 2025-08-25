@@ -5,14 +5,10 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "League of Legends Champions",
+  title: "League of Legends Stats",
   description:
-    "Browse and search League of Legends champions with detailed information",
-  icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon.ico",
-    apple: "/favicon.ico",
-  },
+    "Browse and search League of Legends stats with detailed information",
+  icons: "/favicon.ico",
 };
 
 export default function RootLayout({
@@ -23,7 +19,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="icon" href="/favicon.ico" sizes="32x32" />
+        <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+        <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
       </head>
       <body className={inter.className}>{children}</body>
     </html>
