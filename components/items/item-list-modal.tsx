@@ -46,6 +46,7 @@ interface ItemListModalProps {
   onBulkSave?: (items: { item: Item; slotIndex: number }[]) => void;
   selectedBuild?: 1 | 2;
   mapsData?: any; // Add maps data for filtering
+  existingSelectedItems?: { item: Item; slotIndex: number }[]; // Add existing selected items
 }
 
 export function ItemListModal({
@@ -61,6 +62,7 @@ export function ItemListModal({
   onBulkSave,
   selectedBuild = 1,
   mapsData,
+  existingSelectedItems = [],
 }: ItemListModalProps) {
   const [goldSortDirection, setGoldSortDirection] = useState<
     "none" | "asc" | "desc"
@@ -72,6 +74,19 @@ export function ItemListModal({
   const [bulkSelectedItems, setBulkSelectedItems] = useState<Map<number, Item>>(
     new Map()
   );
+
+  // Initialize bulk selected items with existing ones if modal is open
+  useEffect(() => {
+    if (isOpen && bulkSelectionMode && existingSelectedItems.length > 0) {
+      const newBulkSelectedItems = new Map<number, Item>();
+      existingSelectedItems.forEach(({ slotIndex, item }) => {
+        newBulkSelectedItems.set(slotIndex, item);
+      });
+      setBulkSelectedItems(newBulkSelectedItems);
+    } else if (!isOpen) {
+      setBulkSelectedItems(new Map());
+    }
+  }, [isOpen, bulkSelectionMode, existingSelectedItems]);
 
   // Debounced search effect
   useEffect(() => {
@@ -239,7 +254,9 @@ export function ItemListModal({
         <div className="flex items-center justify-between mb-4 flex-shrink-0">
           <h3 className="text-lg font-semibold">
             {bulkSelectionMode
-              ? `Select 6 Items for Build ${selectedBuild}`
+              ? existingSelectedItems.length > 0
+                ? `Edit 6 Items for Build ${selectedBuild}`
+                : `Select 6 Items for Build ${selectedBuild}`
               : `Select ${getSlotLabel(selectedSlot!)}`}
           </h3>
           <Button variant="ghost" size="sm" onClick={handleCancel}>
@@ -252,7 +269,10 @@ export function ItemListModal({
           <div className="mb-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg flex-shrink-0">
             <div className="flex items-center justify-between mb-3">
               <h4 className="font-medium">
-                Selected Items ({bulkSelectedItems.size}/6)
+                {existingSelectedItems.length > 0
+                  ? "Current Items"
+                  : "Selected Items"}{" "}
+                ({bulkSelectedItems.size}/6)
               </h4>
               {!isAllSlotsFilled && (
                 <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 text-sm">
@@ -575,7 +595,7 @@ export function ItemListModal({
               className="flex items-center gap-2"
             >
               <Save className="w-4 h-4" />
-              Save Items
+              {existingSelectedItems.length > 0 ? "Update Items" : "Save Items"}
             </Button>
           </div>
         )}

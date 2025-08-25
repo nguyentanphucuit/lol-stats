@@ -89,20 +89,12 @@ export function ItemsSelector({
     selectedItems: { item: any; slotIndex: number }[]
   ) => {
     if (selectedBuild === 1) {
-      // Clear existing items first
-      for (let i = 0; i < 6; i++) {
-        onItemRemove1(i);
-      }
-      // Add new items
+      // Update only the slots that have new items, preserve existing ones
       selectedItems.forEach(({ item, slotIndex }) => {
         onItemSelect1(item, slotIndex);
       });
     } else {
-      // Clear existing items first
-      for (let i = 0; i < 6; i++) {
-        onItemRemove2(i);
-      }
-      // Add new items
+      // Update only the slots that have new items, preserve existing ones
       selectedItems.forEach(({ item, slotIndex }) => {
         onItemSelect2(item, slotIndex);
       });
@@ -278,6 +270,23 @@ export function ItemsSelector({
             onBulkSave={handleBulkSave}
             selectedBuild={selectedBuild}
             mapsData={maps}
+            existingSelectedItems={
+              bulkSelectionMode
+                ? (selectedBuild === 1 ? selectedItems1 : selectedItems2).map(
+                    (item) => ({
+                      item: {
+                        id: item.id,
+                        name: item.name,
+                        image: item.icon,
+                        gold: { total: item.gold },
+                        tags: [],
+                        maps: {},
+                      },
+                      slotIndex: item.slotIndex,
+                    })
+                  )
+                : []
+            }
           />
         </CardContent>
       </Card>
