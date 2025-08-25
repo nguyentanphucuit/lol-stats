@@ -11,7 +11,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 
 interface Item {
   id: string;
@@ -49,6 +49,24 @@ export function ItemListModal({
   const [selectedDepth, setSelectedDepth] = useState<number | null>(3); // Default to depth 3
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(50); // Show 50 items per page
+  const [localSearchTerm, setLocalSearchTerm] = useState(searchTerm);
+
+  // Debounced search effect
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (localSearchTerm !== searchTerm) {
+        onSearchChange(localSearchTerm);
+        resetToFirstPage(); // Reset to first page when search changes
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [localSearchTerm, searchTerm, onSearchChange]);
+
+  // Update local search term when prop changes
+  useEffect(() => {
+    setLocalSearchTerm(searchTerm);
+  }, [searchTerm]);
 
   // Sort function by gold (only sorts the items array, no params changed)
   const sortedItems = useMemo(() => {
@@ -112,8 +130,8 @@ export function ItemListModal({
   };
 
   const clearAllFilters = () => {
-    setGoldSortDirection("none");
-    setSelectedDepth(null);
+    setGoldSortDirection("desc"); // Reset to default instead of "none"
+    setSelectedDepth(3); // Reset to default instead of null
     resetToFirstPage();
   };
 
@@ -154,8 +172,8 @@ export function ItemListModal({
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <Input
               placeholder="Search items..."
-              value={searchTerm}
-              onChange={(e) => onSearchChange(e.target.value)}
+              value={localSearchTerm}
+              onChange={(e) => setLocalSearchTerm(e.target.value)}
               className="pl-10"
             />
           </div>
