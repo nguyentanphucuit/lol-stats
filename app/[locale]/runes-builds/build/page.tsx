@@ -1,39 +1,35 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { useLocale } from "@/components/providers/locale-provider";
-import { getLocaleCode } from "@/lib/locale-utils";
-import { useChampions } from "@/hooks/useChampions";
-import { useRuneTrees } from "@/hooks/useRuneTrees";
-import { useStatPerks } from "@/hooks/useStatPerks";
-import { useSpells } from "@/hooks/useSpells";
-import { runesService } from "@/lib/runes-service";
-import { spellsService } from "@/lib/spells-service";
-import Image from "next/image";
-import { ArrowLeft, Plus } from "lucide-react";
-import Link from "next/link";
-import { PrimaryTreeSelector } from "@/components/runes/primary-tree-selector";
-import { SecondaryTreeSelector } from "@/components/runes/secondary-tree-selector";
-import { ShardSelector } from "@/components/runes/shard-selector";
-import { SaveBuildModal } from "@/components/runes/save-build-modal";
+import type { Champion } from "@/components/champions/champion-section";
 import { ChampionSection } from "@/components/champions/champion-section";
 import { ChampionSelectorModal } from "@/components/champions/champion-selector-modal";
-import { ItemsSelector, SelectedItem } from "@/components/items/items-selector";
-import { SpellsSelector } from "../../../../components/spells/spells-selector";
-import {
-  ModeSelector,
-  GAME_MODES,
-} from "@/components/game-modes/mode-selector";
-import type { Champion } from "@/components/champions/champion-section";
 import type { GameMode } from "@/components/game-modes/mode-selector";
+import {
+  GAME_MODES,
+  ModeSelector,
+} from "@/components/game-modes/mode-selector";
+import { ItemsSelector, SelectedItem } from "@/components/items/items-selector";
+import { useLocale } from "@/components/providers/locale-provider";
+import { RuneBuildSection } from "@/components/runes/rune-build-section";
+import { SaveBuildModal } from "@/components/runes/save-build-modal";
 import {
   RuneTree,
   SelectedRune,
   SelectedShard,
 } from "@/components/runes/types";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { useChampions } from "@/hooks/useChampions";
+import { useRuneTrees } from "@/hooks/useRuneTrees";
+import { useSpells } from "@/hooks/useSpells";
+import { useStatPerks } from "@/hooks/useStatPerks";
+import { getLocaleCode } from "@/lib/locale-utils";
+import { spellsService } from "@/lib/spells-service";
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { SpellsSelector } from "../../../../components/spells/spells-selector";
 
 export default function RuneBuilderPage() {
   const { locale } = useLocale();
@@ -51,6 +47,7 @@ export default function RuneBuilderPage() {
   const [selectedShards, setSelectedShards] = useState<SelectedShard[]>([]);
   const [selectedMode, setSelectedMode] = useState<GameMode | null>(null);
   const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([]);
+  const [selectedItems2, setSelectedItems2] = useState<SelectedItem[]>([]);
   const [selectedSpells, setSelectedSpells] = useState<any[]>([]);
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -156,6 +153,27 @@ export default function RuneBuilderPage() {
     );
   };
 
+  const handleItemSelect2 = (item: any, slotIndex: number) => {
+    const newItem: SelectedItem = {
+      id: item.id,
+      name: item.name,
+      icon: item.image, // Use the full image URL from API
+      gold: item.gold.total,
+      slotIndex,
+    };
+
+    setSelectedItems2((prev) => {
+      const filtered = prev.filter((i) => i.slotIndex !== slotIndex);
+      return [...filtered, newItem];
+    });
+  };
+
+  const handleItemRemove2 = (slotIndex: number) => {
+    setSelectedItems2((prev) =>
+      prev.filter((item) => item.slotIndex !== slotIndex)
+    );
+  };
+
   const handleSpellSelect = (spell: any, slotIndex: number) => {
     const newSpell: any = {
       id: spell.id,
@@ -211,8 +229,13 @@ export default function RuneBuilderPage() {
       return false;
     }
 
-    // Check if we have all 6 items
+    // Check if we have all 6 items in Item Build 1 (required)
     if (selectedItems.length < 6) {
+      return false;
+    }
+
+    // Item Build 2 validation: if started (has items), must have 6 items
+    if (selectedItems2.length > 0 && selectedItems2.length < 6) {
       return false;
     }
 
@@ -275,7 +298,13 @@ export default function RuneBuilderPage() {
             ...shard,
             id: shard.id?.toString() || String(shard.id), // Safe conversion with fallback
           })),
-        selectedItems: selectedItems
+        selectedItems1: selectedItems
+          .sort((a, b) => a.slotIndex - b.slotIndex)
+          .map((item) => ({
+            ...item,
+            id: item.id?.toString() || String(item.id), // Safe conversion with fallback
+          })),
+        selectedItems2: selectedItems2
           .sort((a, b) => a.slotIndex - b.slotIndex)
           .map((item) => ({
             ...item,
@@ -403,67 +432,15 @@ export default function RuneBuilderPage() {
 
           {/* Right Column - Rune Selection */}
           <div className="lg:col-span-2">
-            <div className="flex flex-col lg:flex-row gap-6 mb-6">
+            <div className="flex flex-col lg:flex-row gap-6 mb-6 justify-center">
               <ChampionSection
                 selectedChampion={selectedChampion}
                 onShowChampionSelector={() => setShowChampionSelector(true)}
               />
-              <ModeSelector
-                selectedMode={selectedMode}
-                onModeSelect={handleModeSelect}
-              />
-              <Card className="flex-1">
-                <CardHeader>
-                  <CardTitle>Rune Build</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {runeTreesLoading || statPerksLoading || spellsLoading ? (
-                    <div className="text-center py-8">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
-                      <p className="mt-2 text-gray-600">
-                        Loading rune trees, stat perks, or spells...
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col xl:flex-row gap-8">
-                      {/* Primary Tree */}
-                      <PrimaryTreeSelector
-                        runeTrees={runeTrees}
-                        selectedTree={selectedTree}
-                        selectedRunes={selectedRunes}
-                        onTreeSelect={handleTreeSelect}
-                        onRuneSelect={handleRuneSelect}
-                      />
-
-                      {/* Secondary Tree */}
-                      <div className="w-full xl:w-32">
-                        <SecondaryTreeSelector
-                          runeTrees={runeTrees}
-                          selectedTree={selectedTree}
-                          selectedSecondaryTree={selectedSecondaryTree}
-                          selectedRunes={selectedRunes}
-                          onSecondaryTreeSelect={handleSecondaryTreeSelect}
-                          onRuneSelect={handleRuneSelect}
-                        />
-
-                        {/* Shards */}
-                        <ShardSelector
-                          statPerks={statPerks}
-                          selectedShards={selectedShards}
-                          onShardSelect={handleShardSelect}
-                          locale={locale}
-                        />
-                      </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
               <div className="flex flex-col gap-4">
-                {/* Items Selector */}
-                <ItemsSelector
-                  selectedItems={selectedItems}
-                  onItemSelect={handleItemSelect}
-                  onItemRemove={handleItemRemove}
+                <ModeSelector
+                  selectedMode={selectedMode}
+                  onModeSelect={handleModeSelect}
                 />
                 {/* Spells Selector */}
                 <SpellsSelector
@@ -472,6 +449,31 @@ export default function RuneBuilderPage() {
                   onSpellRemove={handleSpellRemove}
                 />
               </div>
+              <RuneBuildSection
+                runeTrees={runeTrees || []}
+                selectedTree={selectedTree}
+                selectedSecondaryTree={selectedSecondaryTree}
+                selectedRunes={selectedRunes}
+                selectedShards={selectedShards}
+                runeTreesLoading={runeTreesLoading}
+                statPerksLoading={statPerksLoading}
+                spellsLoading={spellsLoading}
+                enabled={true} // Enable selection in build mode
+                onTreeSelect={handleTreeSelect}
+                onSecondaryTreeSelect={handleSecondaryTreeSelect}
+                onRuneSelect={handleRuneSelect}
+                onShardSelect={handleShardSelect}
+                locale={locale}
+              />
+              {/* Items Selector */}
+              <ItemsSelector
+                selectedItems1={selectedItems}
+                selectedItems2={selectedItems2}
+                onItemSelect1={handleItemSelect}
+                onItemRemove1={handleItemRemove}
+                onItemSelect2={handleItemSelect2}
+                onItemRemove2={handleItemRemove2}
+              />
             </div>
           </div>
         </div>
@@ -491,8 +493,9 @@ export default function RuneBuilderPage() {
           </Button>
           {!isBuildComplete() && (
             <p className="text-sm text-gray-500 mt-2">
-              Select game mode, champion, all required runes, shards, items, and
-              spells to enable save
+              Select game mode, champion, all required runes, shards, Item Build
+              1 (6 items), and spells to enable save. Item Build 2 is optional
+              but must be completed if started.
             </p>
           )}
         </div>
@@ -516,7 +519,8 @@ export default function RuneBuilderPage() {
             secondaryTree: selectedSecondaryTree,
             selectedRunes: selectedRunes,
             selectedShards: selectedShards,
-            selectedItems: selectedItems,
+            selectedItems1: selectedItems,
+            selectedItems2: selectedItems2,
             selectedSpells: selectedSpells,
           }}
           onConfirm={handleConfirmSave}

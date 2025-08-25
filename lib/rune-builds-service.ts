@@ -4,14 +4,15 @@ export interface RuneBuildData {
   championKey?: string
   championName?: string
   gameMode: string
-  primaryTreeId: string
+  primaryTreeId: number
   primaryTreeName: string
-  secondaryTreeId: string
+  secondaryTreeId: number
   secondaryTreeName: string
   primaryRunes: any[]
   secondaryRunes: any[]
   statShards: any[]
-  selectedItems: any[]
+  selectedItems1: any[]
+  selectedItems2: any[]
   selectedSpells: any[]
 }
 
@@ -26,15 +27,37 @@ export class RuneBuildsService {
           championKey: buildData.championKey,
           championName: buildData.championName,
           gameMode: buildData.gameMode,
-          primaryTreeId: buildData.primaryTreeId,
+          primaryTreeId: Number(buildData.primaryTreeId),
           primaryTreeName: buildData.primaryTreeName,
-          secondaryTreeId: buildData.secondaryTreeId,
+          secondaryTreeId: Number(buildData.secondaryTreeId),
           secondaryTreeName: buildData.secondaryTreeName,
-          primaryRunes: buildData.primaryRunes,
-          secondaryRunes: buildData.secondaryRunes,
-          statShards: buildData.statShards,
-          selectedItems: buildData.selectedItems,
-          selectedSpells: buildData.selectedSpells,
+          primaryRunes: buildData.primaryRunes.map(rune => ({
+            ...rune,
+            id: Number(rune.id),
+            slotNumber: Number(rune.slotNumber)
+          })),
+          secondaryRunes: buildData.secondaryRunes.map(rune => ({
+            ...rune,
+            id: Number(rune.id),
+            slotNumber: Number(rune.slotNumber)
+          })),
+          statShards: buildData.statShards.map(shard => ({
+            ...shard,
+            id: Number(shard.id),
+            slotIndex: Number(shard.slotIndex)
+          })),
+          selectedItems1: buildData.selectedItems1.map(item => ({
+            ...item,
+            id: Number(item.id)
+          })),
+          selectedItems2: buildData.selectedItems2.map(item => ({
+            ...item,
+            id: Number(item.id)
+          })),
+          selectedSpells: buildData.selectedSpells.map(spell => ({
+            ...spell,
+            id: Number(spell.id)
+          })),
         },
       })
       

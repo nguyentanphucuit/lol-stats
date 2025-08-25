@@ -19,7 +19,8 @@ interface SaveBuildModalProps {
     secondaryTree: RuneTree | null;
     selectedRunes: SelectedRune[];
     selectedShards: SelectedShard[];
-    selectedItems: SelectedItem[];
+    selectedItems1: SelectedItem[];
+    selectedItems2: SelectedItem[];
     selectedSpells: SelectedSpell[];
   };
   onConfirm: () => void;
@@ -43,7 +44,8 @@ export function SaveBuildModal({
     secondaryTree,
     selectedRunes,
     selectedShards,
-    selectedItems,
+    selectedItems1,
+    selectedItems2,
     selectedSpells,
   } = buildData;
 
@@ -273,18 +275,63 @@ export function SaveBuildModal({
           </div>
 
           {/* Items Display */}
-          {selectedItems.length > 0 && (
+          {selectedItems1.length > 0 && (
             <Card className="mt-6">
               <CardHeader className="pb-3">
-                <CardTitle className="text-lg">Item Build</CardTitle>
+                <CardTitle className="text-lg">Item Build 1</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                  {selectedItems
+                  {selectedItems1
                     .sort((a, b) => a.slotIndex - b.slotIndex)
                     .map((item, index) => (
                       <div
                         key={`item-${item.id || item.slotIndex || index}`}
+                        className="flex items-center gap-2 p-2 border rounded"
+                      >
+                        <Image
+                          src={item.icon}
+                          alt={item.name}
+                          width={32}
+                          height={32}
+                          className="rounded object-cover"
+                          onError={(e) => {
+                            const target = e.currentTarget as HTMLImageElement;
+                            target.style.display = "none";
+                            const parent = target.parentElement;
+                            if (parent) {
+                              parent.innerHTML = `<span class="text-gray-500 dark:text-gray-400 font-medium text-xs">${item.name.charAt(0)}</span>`;
+                            }
+                          }}
+                        />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">
+                            {item.name}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {item.gold.toLocaleString()} gold
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Items Build 2 Display */}
+          {selectedItems2.length > 0 && (
+            <Card className="mt-6">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg">Item Build 2</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {selectedItems2
+                    .sort((a, b) => a.slotIndex - b.slotIndex)
+                    .map((item, index) => (
+                      <div
+                        key={`item2-${item.id || item.slotIndex || index}`}
                         className="flex items-center gap-2 p-2 border rounded"
                       >
                         <Image

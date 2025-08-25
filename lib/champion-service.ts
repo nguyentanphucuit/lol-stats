@@ -3,7 +3,15 @@ import { APP_CONFIG } from './constants'
 
 // Champion service functions
 export const championService = {
-  // Get champion image URL from champion data
+  // Get champion image URL by champion key
+  getChampionImageUrlByKey: (championKey: string): string => {
+    if (!championKey || championKey === "unknown") {
+      return "https://ddragon.leagueoflegends.com/cdn/img/champion/centered/Unknown.png" // Fallback image
+    }
+    return `https://ddragon.leagueoflegends.com/cdn/${LEAGUE_CONFIG.PATCH}/img/champion/${championKey}.png`
+  },
+
+  // Get champion image URL from champion data (legacy method)
   getChampionImageUrl: (imageUrl: string): string => {
     return imageUrl
   },

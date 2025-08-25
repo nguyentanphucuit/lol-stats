@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
     const buildData: RuneBuildData = body;
 
     // Validate required fields
-    if (!buildData.gameMode || !buildData.primaryTreeId || !buildData.secondaryTreeId || !buildData.selectedItems) {
+    if (!buildData.gameMode || !buildData.primaryTreeId || !buildData.secondaryTreeId || !buildData.selectedItems1) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }

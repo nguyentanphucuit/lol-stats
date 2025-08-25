@@ -73,8 +73,7 @@ export function SpellsSelector({
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Plus className="w-5 h-5" />
-            Spells (2 Spells)
+            <Plus className="w-5 h-5" />2 Spells
           </CardTitle>
         </CardHeader>
         <CardContent>

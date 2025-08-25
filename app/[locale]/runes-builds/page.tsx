@@ -89,7 +89,7 @@ export default function RunesBuildsPage() {
           build.statShards.some((shard) =>
             shard.name?.toLowerCase().includes(searchLower)
           ) ||
-          build.selectedItems?.some((item) =>
+          build.selectedItems1?.some((item) =>
             item.name?.toLowerCase().includes(searchLower)
           ) ||
           build.selectedSpells?.some((spell) =>
@@ -659,88 +659,184 @@ export default function RunesBuildsPage() {
                             </div>
                           </TableCell>
                           <TableCell>
-                            <div className="flex flex-wrap gap-1">
-                              {build.selectedItems &&
-                              build.selectedItems.length > 0 ? (
-                                build.selectedItems.map((item, index) => (
-                                  <Tooltip key={index}>
-                                    <TooltipTrigger asChild>
-                                      <div className="w-8 h-8 relative flex-shrink-0 rounded bg-gray-200 dark:bg-gray-700 flex items-center justify-center cursor-help hover:scale-110 transition-transform duration-200">
-                                        {item.icon ? (
-                                          <Image
-                                            src={item.icon}
-                                            alt={
-                                              item.name || `Item ${index + 1}`
-                                            }
-                                            width={32}
-                                            height={32}
-                                            className="rounded object-cover"
-                                            onError={(e) => {
-                                              const target =
-                                                e.currentTarget as HTMLImageElement;
-                                              target.style.display = "none";
-                                              const parent =
-                                                target.parentElement;
-                                              if (parent) {
-                                                parent.innerHTML = `<span class="text-gray-500 dark:text-gray-400 font-medium text-xs">${(item.name || `I${index + 1}`).charAt(0)}</span>`;
-                                              }
-                                            }}
-                                          />
-                                        ) : (
-                                          <span className="text-gray-500 dark:text-gray-400 font-medium text-xs">
-                                            {item.name
-                                              ? item.name.charAt(0)
-                                              : `I${index + 1}`}
-                                          </span>
-                                        )}
-                                      </div>
-                                    </TooltipTrigger>
-                                    <TooltipContent
-                                      side="top"
-                                      className="max-w-sm"
-                                    >
-                                      <div className="space-y-2">
-                                        <div className="flex items-center gap-2">
-                                          {item.icon && (
-                                            <div className="w-5 h-5 relative">
+                            <div className="space-y-2">
+                              {/* Item Build 1 */}
+                              <div>
+                                <div className="flex flex-wrap gap-1">
+                                  {build.selectedItems1 &&
+                                  build.selectedItems1.length > 0 ? (
+                                    build.selectedItems1.map((item, index) => (
+                                      <Tooltip key={index}>
+                                        <TooltipTrigger asChild>
+                                          <div className="w-8 h-8 relative flex-shrink-0 rounded bg-gray-200 dark:bg-gray-700 flex items-center justify-center cursor-help hover:scale-110 transition-transform duration-200">
+                                            {item.icon ? (
                                               <Image
                                                 src={item.icon}
                                                 alt={
                                                   item.name ||
                                                   `Item ${index + 1}`
                                                 }
-                                                width={20}
-                                                height={20}
+                                                width={32}
+                                                height={32}
                                                 className="rounded object-cover"
+                                                onError={(e) => {
+                                                  const target =
+                                                    e.currentTarget as HTMLImageElement;
+                                                  target.style.display = "none";
+                                                  const parent =
+                                                    target.parentElement;
+                                                  if (parent) {
+                                                    parent.innerHTML = `<span className="text-gray-500 dark:text-gray-400 font-medium text-xs">${(item.name || `I${index + 1}`).charAt(0)}</span>`;
+                                                  }
+                                                }}
                                               />
+                                            ) : (
+                                              <span className="text-gray-500 dark:text-gray-400 font-medium text-xs">
+                                                {item.name
+                                                  ? item.name.charAt(0)
+                                                  : `I${index + 1}`}
+                                              </span>
+                                            )}
+                                          </div>
+                                        </TooltipTrigger>
+                                        <TooltipContent
+                                          side="top"
+                                          className="max-w-sm"
+                                        >
+                                          <div className="space-y-2">
+                                            <div className="flex items-center gap-2">
+                                              {item.icon && (
+                                                <div className="w-5 h-5 relative">
+                                                  <Image
+                                                    src={item.icon}
+                                                    alt={
+                                                      item.name ||
+                                                      `Item ${index + 1}`
+                                                    }
+                                                    width={20}
+                                                    height={20}
+                                                    className="rounded object-cover"
+                                                  />
+                                                </div>
+                                              )}
+                                              <p className="font-bold text-blue-600 dark:text-blue-400">
+                                                {item.name ||
+                                                  `Item ${index + 1}`}
+                                              </p>
                                             </div>
-                                          )}
-                                          <p className="font-bold text-blue-600 dark:text-blue-400">
-                                            {item.name || `Item ${index + 1}`}
-                                          </p>
-                                        </div>
-                                        <div className="border-t border-gray-200 dark:border-gray-600 pt-2">
-                                          <p className="text-sm text-gray-700 dark:text-gray-300">
-                                            Slot:{" "}
-                                            {item.slotIndex !== undefined
-                                              ? item.slotIndex + 1
-                                              : index + 1}
-                                          </p>
-                                          <p className="text-xs text-gray-500">
-                                            {item.gold
-                                              ? `${item.gold.toLocaleString()} gold`
-                                              : "Unknown gold cost"}
-                                          </p>
-                                        </div>
-                                      </div>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                ))
-                              ) : (
-                                <span className="text-gray-400 text-xs">
-                                  No items
-                                </span>
-                              )}
+                                            <div className="border-t border-gray-200 dark:border-gray-600 pt-2">
+                                              <p className="text-sm text-gray-700 dark:text-gray-300">
+                                                Slot:{" "}
+                                                {item.slotIndex !== undefined
+                                                  ? item.slotIndex + 1
+                                                  : index + 1}
+                                              </p>
+                                              <p className="text-xs text-gray-500">
+                                                {item.gold
+                                                  ? `${item.gold.toLocaleString()} gold`
+                                                  : "Unknown gold cost"}
+                                              </p>
+                                            </div>
+                                          </div>
+                                        </TooltipContent>
+                                      </Tooltip>
+                                    ))
+                                  ) : (
+                                    <span className="text-gray-400 text-xs">
+                                      No items
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+
+                              {/* Item Build 2 - Only show if it exists */}
+                              {build.selectedItems2 &&
+                                build.selectedItems2.length > 0 && (
+                                  <div>
+                                    <div className="flex flex-wrap gap-1">
+                                      {build.selectedItems2.map(
+                                        (item, index) => (
+                                          <Tooltip key={index}>
+                                            <TooltipTrigger asChild>
+                                              <div className="w-8 h-8 relative flex-shrink-0 rounded bg-gray-200 dark:bg-gray-700 flex items-center justify-center cursor-help hover:scale-110 transition-transform duration-200">
+                                                {item.icon ? (
+                                                  <Image
+                                                    src={item.icon}
+                                                    alt={
+                                                      item.name ||
+                                                      `Item ${index + 1}`
+                                                    }
+                                                    width={32}
+                                                    height={32}
+                                                    className="rounded object-cover"
+                                                    onError={(e) => {
+                                                      const target =
+                                                        e.currentTarget as HTMLImageElement;
+                                                      target.style.display =
+                                                        "none";
+                                                      const parent =
+                                                        target.parentElement;
+                                                      if (parent) {
+                                                        parent.innerHTML = `<span className="text-gray-500 dark:text-gray-400 font-medium text-xs">${(item.name || `I${index + 1}`).charAt(0)}</span>`;
+                                                      }
+                                                    }}
+                                                  />
+                                                ) : (
+                                                  <span className="text-gray-500 dark:text-gray-400 font-medium text-xs">
+                                                    {item.name
+                                                      ? item.name.charAt(0)
+                                                      : `I${index + 1}`}
+                                                  </span>
+                                                )}
+                                              </div>
+                                            </TooltipTrigger>
+                                            <TooltipContent
+                                              side="top"
+                                              className="max-w-sm"
+                                            >
+                                              <div className="space-y-2">
+                                                <div className="flex items-center gap-2">
+                                                  {item.icon && (
+                                                    <div className="w-5 h-5 relative">
+                                                      <Image
+                                                        src={item.icon}
+                                                        alt={
+                                                          item.name ||
+                                                          `Item ${index + 1}`
+                                                        }
+                                                        width={20}
+                                                        height={20}
+                                                        className="rounded object-cover"
+                                                      />
+                                                    </div>
+                                                  )}
+                                                  <p className="font-bold text-blue-600 dark:text-blue-400">
+                                                    {item.name ||
+                                                      `Item ${index + 1}`}
+                                                  </p>
+                                                </div>
+                                                <div className="border-t border-gray-200 dark:border-gray-600 pt-2">
+                                                  <p className="text-sm text-gray-700 dark:text-gray-300">
+                                                    Slot:{" "}
+                                                    {item.slotIndex !==
+                                                    undefined
+                                                      ? item.slotIndex + 1
+                                                      : index + 1}
+                                                  </p>
+                                                  <p className="text-xs text-gray-500">
+                                                    {item.gold
+                                                      ? `${item.gold.toLocaleString()} gold`
+                                                      : "Unknown gold cost"}
+                                                  </p>
+                                                </div>
+                                              </div>
+                                            </TooltipContent>
+                                          </Tooltip>
+                                        )
+                                      )}
+                                    </div>
+                                  </div>
+                                )}
                             </div>
                           </TableCell>
                           <TableCell>

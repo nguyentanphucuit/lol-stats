@@ -24,14 +24,15 @@ model RuneBuild {
   championKey       String?
   championName      String?
   gameMode          String
-  primaryTreeId     String
+  primaryTreeId     Int
   primaryTreeName   String
-  secondaryTreeId   String
+  secondaryTreeId   Int
   secondaryTreeName String
   primaryRunes      Json
   secondaryRunes    Json
   statShards        Json
-  selectedItems     Json     @default("[]")
+  selectedItems1    Json     @default("[]")
+  selectedItems2    Json     @default("[]")
   selectedSpells    Json     @default("[]")
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
