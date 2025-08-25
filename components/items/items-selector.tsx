@@ -46,7 +46,7 @@ export function ItemsSelector({
 
   const { items, isLoading } = useItems({
     page: 1,
-    limit: 200,
+    limit: 1000,
     q: searchTerm,
   });
 

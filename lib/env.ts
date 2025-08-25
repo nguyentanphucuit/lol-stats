@@ -9,7 +9,7 @@ export const ENV_CONFIG = {
   // Application settings
   ITEMS_PER_PAGE: parseInt(process.env.NEXT_PUBLIC_ITEMS_PER_PAGE || '30'),
   MAX_ITEMS_PER_PAGE: parseInt(
-    process.env.NEXT_PUBLIC_MAX_ITEMS_PER_PAGE || '200'
+    process.env.NEXT_PUBLIC_MAX_ITEMS_PER_PAGE || '1000'
   ),
   MAX_VISIBLE_PAGES: parseInt(
     process.env.NEXT_PUBLIC_MAX_VISIBLE_PAGES || '10'
