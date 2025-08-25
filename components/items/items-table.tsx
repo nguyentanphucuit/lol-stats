@@ -1,6 +1,6 @@
-'use client'
+"use client";
 
-import Image from 'next/image'
+import Image from "next/image";
 import {
   Table,
   TableBody,
@@ -8,17 +8,17 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import { Skeleton } from '@/components/ui/skeleton'
-import { Badge } from '@/components/ui/badge'
-import { Item } from '@/types'
-import { itemsService } from '@/lib/items-service'
-import { APP_CONFIG } from '@/lib/constants'
+} from "@/components/ui/table";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
+import { Item } from "@/types";
+import { itemsService } from "@/lib/items-service";
+import { APP_CONFIG } from "@/lib/constants";
 
 interface ItemsTableProps {
-  items: Item[]
-  isLoading: boolean
-  itemsPerPage: number
+  items: Item[];
+  isLoading: boolean;
+  itemsPerPage: number;
 }
 
 export function ItemsTable({
@@ -27,8 +27,8 @@ export function ItemsTable({
   itemsPerPage,
 }: ItemsTableProps) {
   const renderLoadingSkeletons = () => {
-    const imageSize = APP_CONFIG.CHAMPION_IMAGE_SIZE
-    const imageSizeClass = `w-${imageSize / 4} h-${imageSize / 4}`
+    const imageSize = APP_CONFIG.CHAMPION_IMAGE_SIZE;
+    const imageSizeClass = `w-${imageSize / 4} h-${imageSize / 4}`;
 
     return Array.from({ length: itemsPerPage }).map((_, i) => (
       <TableRow key={`items-skeleton-${i}`}>
@@ -58,8 +58,8 @@ export function ItemsTable({
           </div>
         </TableCell>
       </TableRow>
-    ))
-  }
+    ));
+  };
 
   const renderEmptyState = () => (
     <TableRow>
@@ -70,7 +70,7 @@ export function ItemsTable({
         </div>
       </TableCell>
     </TableRow>
-  )
+  );
 
   if (isLoading) {
     return (
@@ -87,7 +87,7 @@ export function ItemsTable({
         </TableHeader>
         <TableBody>{renderLoadingSkeletons()}</TableBody>
       </Table>
-    )
+    );
   }
 
   if (!items || items.length === 0) {
@@ -105,11 +105,11 @@ export function ItemsTable({
         </TableHeader>
         <TableBody>{renderEmptyState()}</TableBody>
       </Table>
-    )
+    );
   }
 
-  const imageSize = APP_CONFIG.CHAMPION_IMAGE_SIZE
-  const imageSizeClass = `w-${imageSize / 4} h-${imageSize / 4}`
+  const imageSize = APP_CONFIG.CHAMPION_IMAGE_SIZE;
+  const imageSizeClass = `w-${imageSize / 4} h-${imageSize / 4}`;
 
   return (
     <Table>
@@ -136,14 +136,14 @@ export function ItemsTable({
                   width={imageSize}
                   height={imageSize}
                   className="rounded-md object-cover"
-                  onError={e => {
-                    console.error('Image failed to load:', item.image, e)
+                  onError={(e) => {
+                    console.error("Image failed to load:", item.image, e);
                     // Show initials when image fails to load
-                    const target = e.currentTarget as HTMLImageElement
-                    target.style.display = 'none'
-                    const parent = target.parentElement
+                    const target = e.currentTarget as HTMLImageElement;
+                    target.style.display = "none";
+                    const parent = target.parentElement;
                     if (parent) {
-                      parent.innerHTML = `<span class="text-gray-500 dark:text-gray-400 font-medium text-sm">${item.name.charAt(0)}</span>`
+                      parent.innerHTML = `<span class="text-gray-500 dark:text-gray-400 font-medium text-sm">${item.name.charAt(0)}</span>`;
                     }
                   }}
                   onLoad={() => {
@@ -187,5 +187,5 @@ export function ItemsTable({
         ))}
       </TableBody>
     </Table>
-  )
+  );
 }

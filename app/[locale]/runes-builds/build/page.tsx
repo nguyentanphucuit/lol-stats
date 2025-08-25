@@ -20,6 +20,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { useToast } from "@/components/ui/toast";
 import { useChampions } from "@/hooks/useChampions";
 import { useRuneTrees } from "@/hooks/useRuneTrees";
 import { useSpells } from "@/hooks/useSpells";
@@ -34,6 +35,7 @@ import { SpellsSelector } from "../../../../components/spells/spells-selector";
 export default function RuneBuilderPage() {
   const { locale } = useLocale();
   const currentLocaleCode = getLocaleCode(locale);
+  const { showToast, ToastContainer } = useToast();
 
   // State
   const [selectedChampion, setSelectedChampion] = useState<Champion | null>(
@@ -96,6 +98,25 @@ export default function RuneBuilderPage() {
       }
     }
   }, [selectedTree, runeTrees, selectedSecondaryTree]);
+
+  // Function to clear all form data
+  const clearFormData = () => {
+    setSelectedChampion(null);
+    setSelectedRunes([]);
+    setSelectedShards([]);
+    setSelectedItems([]);
+    setSelectedItems2([]);
+    setSelectedSpells([]);
+    // Reset to first available trees
+    if (runeTrees && runeTrees.length > 0) {
+      setSelectedTree(runeTrees[0]);
+      if (runeTrees.length > 1) {
+        setSelectedSecondaryTree(runeTrees[1]);
+      }
+    }
+    // Reset to first game mode
+    setSelectedMode(GAME_MODES[0]);
+  };
 
   // Event handlers
   const handleChampionSelect = (champion: Champion) => {
@@ -343,19 +364,17 @@ export default function RuneBuilderPage() {
 
       const result = await response.json();
 
-      // Show success message
-      alert("Rune build saved successfully to database!");
+      // Show success toast
+      showToast("Rune build saved successfully! 🎉", "success");
 
-      // Reset form or close modal
+      // Reset form and close modal
       setShowSaveModal(false);
-
-      // Optionally reset selections
-      // setSelectedRunes([]);
-      // setSelectedShards([]);
+      clearFormData();
     } catch (error) {
       console.error("Error saving rune build:", error);
-      alert(
-        `Failed to save rune build: ${error instanceof Error ? error.message : "Unknown error"}`
+      showToast(
+        `Failed to save rune build: ${error instanceof Error ? error.message : "Unknown error"}`,
+        "error"
       );
     } finally {
       setIsSaving(false);
@@ -411,6 +430,9 @@ export default function RuneBuilderPage() {
   return (
     <TooltipProvider>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        {/* Toast Container */}
+        <ToastContainer />
+
         <div className="container mx-auto px-4 py-8">
           {/* Header */}
           <div className="flex items-center gap-4 mb-8">
@@ -479,18 +501,27 @@ export default function RuneBuilderPage() {
         </div>
 
         {/* Save Build Button */}
-        <div className="mt-6 text-center">
-          <Button
-            onClick={() => handleSaveBuild()}
-            disabled={!isBuildComplete()}
-            className={`px-8 py-2 ${
-              isBuildComplete()
-                ? "bg-blue-600 hover:bg-blue-700 text-white"
-                : "bg-gray-400 text-gray-200 cursor-not-allowed"
-            }`}
-          >
-            Save Build
-          </Button>
+        <div className="mt-6 text-center space-y-4">
+          <div className="flex gap-4 justify-center">
+            <Button
+              onClick={() => handleSaveBuild()}
+              disabled={!isBuildComplete()}
+              className={`px-8 py-2 ${
+                isBuildComplete()
+                  ? "bg-blue-600 hover:bg-blue-700 text-white"
+                  : "bg-gray-400 text-gray-200 cursor-not-allowed"
+              }`}
+            >
+              Save Build
+            </Button>
+            <Button
+              onClick={clearFormData}
+              variant="outline"
+              className="px-8 py-2 border-gray-300 hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-800"
+            >
+              Clear Form
+            </Button>
+          </div>
           {!isBuildComplete() && (
             <p className="text-sm text-gray-500 mt-2">
               Select game mode, champion, all required runes, shards, Item Build

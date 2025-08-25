@@ -30,8 +30,17 @@ import { useLocale } from "@/components/providers/locale-provider";
 import { getLocaleCode } from "@/lib/locale-utils";
 import { getTranslations } from "@/lib/translations";
 import { useRuneBuilds } from "@/hooks/useRuneBuilds";
+import { useToast } from "@/components/ui/toast";
 import Link from "next/link";
-import { Plus, Trash2, Eye, Filter, Search, X } from "lucide-react";
+import {
+  Plus,
+  Trash2,
+  Eye,
+  Filter,
+  Search,
+  X,
+  AlertTriangle,
+} from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import Image from "next/image";
 import { runesService } from "@/lib/runes-service";
@@ -42,12 +51,18 @@ export default function RunesBuildsPage() {
   const { locale } = useLocale();
   const currentLocaleCode = getLocaleCode(locale);
   const translations = getTranslations(locale);
-  const { runeBuilds, isLoading, error } = useRuneBuilds();
+  const { runeBuilds, isLoading, error, refetch } = useRuneBuilds();
+  const { showToast, ToastContainer } = useToast();
 
   // Filter states
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedChampions, setSelectedChampions] = useState<string[]>([]);
   const [selectedGameModes, setSelectedGameModes] = useState<string[]>([]);
+
+  // Delete states
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [buildToDelete, setBuildToDelete] = useState<any>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Get unique values for filters
   const uniqueValues = useMemo(() => {
@@ -120,6 +135,10 @@ export default function RunesBuildsPage() {
     });
   }, [runeBuilds, searchTerm, selectedChampions, selectedGameModes]);
 
+  // Check if there are active filters
+  const hasActiveFilters =
+    searchTerm || selectedChampions.length > 0 || selectedGameModes.length > 0;
+
   // Filter toggle functions
   const toggleChampion = (champion: string) => {
     setSelectedChampions((prev) =>
@@ -132,21 +151,56 @@ export default function RunesBuildsPage() {
   const toggleGameMode = (gameMode: string) => {
     setSelectedGameModes((prev) =>
       prev.includes(gameMode)
-        ? prev.filter((g) => g !== gameMode)
+        ? prev.filter((m) => m !== gameMode)
         : [...prev, gameMode]
     );
   };
 
-  // Clear all filters
   const clearAllFilters = () => {
     setSearchTerm("");
     setSelectedChampions([]);
     setSelectedGameModes([]);
   };
 
-  // Check if any filters are active
-  const hasActiveFilters =
-    searchTerm || selectedChampions.length > 0 || selectedGameModes.length > 0;
+  // Delete functions
+  const openDeleteModal = (build: any) => {
+    setBuildToDelete(build);
+    setDeleteModalOpen(true);
+  };
+
+  const closeDeleteModal = () => {
+    setDeleteModalOpen(false);
+    setBuildToDelete(null);
+  };
+
+  const handleDeleteBuild = async () => {
+    if (!buildToDelete) return;
+
+    try {
+      setIsDeleting(true);
+
+      const response = await fetch(`/api/rune-builds/${buildToDelete.id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete rune build");
+      }
+
+      // Close modal and refresh data
+      closeDeleteModal();
+      refetch(); // Refresh the rune builds list
+      showToast(
+        `Rune build "${buildToDelete.championName} - ${buildToDelete.gameMode}" deleted successfully!`,
+        "success"
+      );
+    } catch (error) {
+      console.error("Error deleting rune build:", error);
+      showToast("Failed to delete rune build. Please try again.", "error");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -441,7 +495,7 @@ export default function RunesBuildsPage() {
                               {build.primaryRunes.map((rune, index) => (
                                 <Tooltip key={index}>
                                   <TooltipTrigger asChild>
-                                    <div className="w-8 h-8 relative flex-shrink-0 rounded bg-gray-200 dark:bg-gray-700 flex items-center justify-center cursor-help hover:scale-110 transition-transform duration-200">
+                                    <div className="w-8 h-8 relative flex-shrink-0 rounded flex items-center justify-center cursor-help hover:scale-110 transition-transform duration-200">
                                       {rune.icon ? (
                                         <Image
                                           src={runesService.getRuneImageUrl(
@@ -514,7 +568,7 @@ export default function RunesBuildsPage() {
                               {build.secondaryRunes.map((rune, index) => (
                                 <Tooltip key={index}>
                                   <TooltipTrigger asChild>
-                                    <div className="w-8 h-8 relative flex-shrink-0 rounded bg-gray-200 dark:bg-gray-700 flex items-center justify-center cursor-help hover:scale-110 transition-transform duration-200">
+                                    <div className="w-8 h-8 relative flex-shrink-0 rounded flex items-center justify-center cursor-help hover:scale-110 transition-transform duration-200">
                                       {rune.icon ? (
                                         <Image
                                           src={runesService.getRuneImageUrl(
@@ -935,6 +989,7 @@ export default function RunesBuildsPage() {
                                 variant="outline"
                                 size="sm"
                                 className="text-red-600 hover:text-red-700"
+                                onClick={() => openDeleteModal(build)}
                               >
                                 <Trash2 className="w-4 h-4" />
                               </Button>
@@ -962,6 +1017,37 @@ export default function RunesBuildsPage() {
           )}
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {deleteModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl max-w-md w-full">
+            <div className="flex justify-center items-center mb-4">
+              <AlertTriangle className="w-12 h-12 text-red-500" />
+            </div>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
+              Confirm Deletion
+            </h3>
+            <p className="text-gray-700 dark:text-gray-300 mb-4">
+              Are you sure you want to delete this rune build? This action
+              cannot be undone.
+            </p>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={closeDeleteModal}>
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleDeleteBuild}
+                disabled={isDeleting}
+              >
+                {isDeleting ? "Deleting..." : "Delete"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+      <ToastContainer />
     </TooltipProvider>
   );
 }
