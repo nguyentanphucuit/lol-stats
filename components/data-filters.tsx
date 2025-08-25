@@ -1,16 +1,16 @@
-'use client'
+"use client";
 
-import { Search, Filter, X } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Badge } from '@/components/ui/badge'
+import { Search, Filter, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
+} from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,18 +18,19 @@ import {
   DropdownMenuTrigger,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-} from '@/components/ui/dropdown-menu'
+} from "@/components/ui/dropdown-menu";
+import { useState, useEffect } from "react";
 
 interface DataFiltersProps {
-  searchQuery: string
-  selectedTags: string[]
-  availableTags: string[] | undefined
-  onSearchChange: (value: string) => void
-  onTagToggle: (tag: string) => void
-  onClearFilters: () => void
-  searchPlaceholder: string
-  tagLabel: string
-  description: string
+  searchQuery: string;
+  selectedTags: string[];
+  availableTags: string[] | undefined;
+  onSearchChange: (value: string) => void;
+  onTagToggle: (tag: string) => void;
+  onClearFilters: () => void;
+  searchPlaceholder: string;
+  tagLabel: string;
+  description: string;
 }
 
 export function DataFilters({
@@ -43,7 +44,25 @@ export function DataFilters({
   tagLabel,
   description,
 }: DataFiltersProps) {
-  const hasActiveFilters = searchQuery || selectedTags.length > 0
+  const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery);
+
+  // Debounced search effect
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (localSearchQuery !== searchQuery) {
+        onSearchChange(localSearchQuery);
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [localSearchQuery, searchQuery, onSearchChange]);
+
+  // Update local search query when prop changes
+  useEffect(() => {
+    setLocalSearchQuery(searchQuery);
+  }, [searchQuery]);
+
+  const hasActiveFilters = searchQuery || selectedTags.length > 0;
 
   const renderTagsDropdown = () => {
     if (!availableTags) {
@@ -51,7 +70,7 @@ export function DataFilters({
         <DropdownMenuLabel className="text-gray-500">
           Loading tags...
         </DropdownMenuLabel>
-      )
+      );
     }
 
     if (availableTags.length === 0) {
@@ -59,10 +78,10 @@ export function DataFilters({
         <DropdownMenuLabel className="text-gray-500">
           No tags available
         </DropdownMenuLabel>
-      )
+      );
     }
 
-    return availableTags.map(tag => (
+    return availableTags.map((tag) => (
       <DropdownMenuCheckboxItem
         key={tag}
         checked={selectedTags.includes(tag)}
@@ -70,11 +89,11 @@ export function DataFilters({
       >
         {tag}
       </DropdownMenuCheckboxItem>
-    ))
-  }
+    ));
+  };
 
   const renderActiveFilters = () => {
-    if (!hasActiveFilters) return null
+    if (!hasActiveFilters) return null;
 
     return (
       <div className="flex flex-wrap gap-2">
@@ -82,14 +101,14 @@ export function DataFilters({
           <Badge variant="secondary" className="flex items-center gap-1">
             Search: "{searchQuery}"
             <button
-              onClick={() => onSearchChange('')}
+              onClick={() => onSearchChange("")}
               className="ml-1 hover:text-red-500"
             >
               <X className="h-3 w-3" />
             </button>
           </Badge>
         )}
-        {selectedTags.map(tag => (
+        {selectedTags.map((tag) => (
           <Badge
             key={tag}
             variant="secondary"
@@ -105,8 +124,8 @@ export function DataFilters({
           </Badge>
         ))}
       </div>
-    )
-  }
+    );
+  };
 
   return (
     <Card className="mb-6">
@@ -120,8 +139,8 @@ export function DataFilters({
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
               placeholder={searchPlaceholder}
-              value={searchQuery}
-              onChange={e => onSearchChange(e.target.value)}
+              value={localSearchQuery}
+              onChange={(e) => setLocalSearchQuery(e.target.value)}
               className="pl-10"
             />
           </div>
@@ -160,5 +179,5 @@ export function DataFilters({
         {renderActiveFilters()}
       </CardContent>
     </Card>
-  )
+  );
 }
