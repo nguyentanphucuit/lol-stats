@@ -18,6 +18,7 @@ import {
   ArrowUpDown,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   Save,
   AlertCircle,
   MapPin,
@@ -244,7 +245,7 @@ export function ItemListModal({
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
       onClick={handleBackdropClick}
     >
       <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-4xl w-full max-h-[90vh] flex flex-col">
@@ -336,96 +337,147 @@ export function ItemListModal({
         )}
 
         {/* Search and Sort Controls */}
-        <div className="flex gap-3 mb-4 flex-shrink-0">
-          <div className="relative flex-1">
+        {/* Search and Filter Controls */}
+        <div className="flex flex-col sm:flex-row gap-4 mb-6">
+          {/* Search Bar - Full width on mobile, flex-1 on desktop */}
+          <div className="relative flex-1 min-w-0">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <Input
-              placeholder="Search items..."
+              placeholder="Search items by name..."
               value={localSearchTerm}
               onChange={(e) => setLocalSearchTerm(e.target.value)}
-              className="pl-10"
+              className="pl-10 h-10 text-sm"
             />
           </div>
-          <div className="flex gap-2">
-            <Button
-              variant={goldSortDirection === "none" ? "default" : "outline"}
-              size="sm"
-              onClick={() => handleGoldSort("none")}
-              className="whitespace-nowrap"
-            >
-              <ArrowUpDown className="w-4 h-4 mr-2" />
-              No Sort
-            </Button>
-            <Button
-              variant={goldSortDirection === "asc" ? "default" : "outline"}
-              size="sm"
-              onClick={() => handleGoldSort("asc")}
-              className="whitespace-nowrap"
-            >
-              <ArrowUpDown className="w-4 h-4 mr-2" />
-              Gold ↑
-            </Button>
-            <Button
-              variant={goldSortDirection === "desc" ? "default" : "outline"}
-              size="sm"
-              onClick={() => handleGoldSort("desc")}
-              className="whitespace-nowrap"
-            >
-              <ArrowUpDown className="w-4 h-4 mr-2" />
-              Gold ↓
-            </Button>
-          </div>
-        </div>
 
-        {/* Map Filter Dropdown */}
-        <div className="flex gap-3 mb-4 flex-shrink-0">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="flex items-center gap-2">
-                <MapPin className="w-4 h-4" />
-                {selectedMap ? getMapName(selectedMap) : "All Maps"}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56 max-h-80 overflow-y-auto">
-              <DropdownMenuLabel>Filter by Map</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => handleMapFilter("")}>
-                All Maps
-              </DropdownMenuItem>
-              {getAvailableMaps().length > 0 ? (
-                getAvailableMaps().map(([mapId, mapInfo]) => (
-                  <DropdownMenuItem
-                    key={mapId}
-                    onClick={() => handleMapFilter(mapId)}
-                    className={
-                      selectedMap === mapId
-                        ? "bg-blue-50 dark:bg-blue-900/20"
-                        : ""
-                    }
-                  >
-                    {(mapInfo as { MapName: string })?.MapName || mapId}
-                  </DropdownMenuItem>
-                ))
-              ) : (
-                <DropdownMenuItem disabled className="text-gray-500">
-                  No maps available
+          {/* Controls Row - Stack on mobile, inline on desktop */}
+          <div className="flex flex-col sm:flex-row gap-3 flex-shrink-0">
+            {/* Sort Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full sm:w-auto justify-between sm:justify-start h-10 px-4"
+                >
+                  <div className="flex items-center gap-2">
+                    <ArrowUpDown className="w-4 h-4" />
+                    <span className="hidden sm:inline">
+                      {goldSortDirection === "none" && "Sort by"}
+                      {goldSortDirection === "asc" && "Gold ↑"}
+                      {goldSortDirection === "desc" && "Gold ↓"}
+                    </span>
+                    <span className="sm:hidden">
+                      {goldSortDirection === "none" && "Sort"}
+                      {goldSortDirection === "asc" && "Cheapest"}
+                      {goldSortDirection === "desc" && "Most Expensive"}
+                    </span>
+                  </div>
+                  <ChevronDown className="w-4 h-4 ml-2" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuLabel className="font-semibold">
+                  Sort by Gold
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() => handleGoldSort("none")}
+                  className={`flex items-center gap-2 ${
+                    goldSortDirection === "none"
+                      ? "bg-blue-50 dark:bg-blue-900/20 font-medium"
+                      : ""
+                  }`}
+                >
+                  <div className="w-2 h-2 rounded-full bg-gray-300"></div>
+                  <span>No Sort</span>
                 </DropdownMenuItem>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+                <DropdownMenuItem
+                  onClick={() => handleGoldSort("asc")}
+                  className={`flex items-center gap-2 ${
+                    goldSortDirection === "asc"
+                      ? "bg-blue-50 dark:bg-blue-900/20 font-medium"
+                      : ""
+                  }`}
+                >
+                  <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                  <span>Gold ↑ (Cheapest First)</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => handleGoldSort("desc")}
+                  className={`flex items-center gap-2 ${
+                    goldSortDirection === "desc"
+                      ? "bg-blue-50 dark:bg-blue-900/20 font-medium"
+                      : ""
+                  }`}
+                >
+                  <div className="w-2 h-2 rounded-full bg-red-500"></div>
+                  <span>Gold ↓ (Most Expensive First)</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
-        {/* Results Summary */}
-        <div className="flex items-center justify-between mb-4 flex-shrink-0 text-sm text-gray-600 dark:text-gray-400">
-          <span>
-            Showing {startIndex + 1}-{Math.min(endIndex, totalItems)} of{" "}
-            {totalItems} items
-          </span>
-          {totalPages > 1 && (
-            <span>
-              Page {currentPage} of {totalPages}
-            </span>
-          )}
+            {/* Map Filter Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full sm:w-auto justify-between sm:justify-start h-10 px-4"
+                >
+                  <div className="flex items-center gap-2">
+                    <MapPin className="w-4 h-4" />
+                    <span className="hidden sm:inline">
+                      {selectedMap ? getMapName(selectedMap) : "All Maps"}
+                    </span>
+                    <span className="sm:hidden">
+                      {selectedMap ? "Map" : "All Maps"}
+                    </span>
+                  </div>
+                  <ChevronDown className="w-4 h-4 ml-2" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56 max-h-80 overflow-y-auto">
+                <DropdownMenuLabel className="font-semibold">
+                  Filter by Map
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() => handleMapFilter("")}
+                  className="flex items-center gap-2"
+                >
+                  <div className="w-2 h-2 rounded-full bg-gray-400"></div>
+                  <span>All Maps</span>
+                </DropdownMenuItem>
+                {getAvailableMaps().length > 0 ? (
+                  getAvailableMaps().map(([mapId, mapInfo]) => (
+                    <DropdownMenuItem
+                      key={mapId}
+                      onClick={() => handleMapFilter(mapId)}
+                      className={`flex items-center gap-2 ${
+                        selectedMap === mapId
+                          ? "bg-blue-50 dark:bg-blue-900/20 font-medium"
+                          : ""
+                      }`}
+                    >
+                      <div
+                        className={`w-2 h-2 rounded-full ${
+                          selectedMap === mapId ? "bg-blue-500" : "bg-gray-300"
+                        }`}
+                      ></div>
+                      <span>
+                        {(mapInfo as { MapName: string })?.MapName || mapId}
+                      </span>
+                    </DropdownMenuItem>
+                  ))
+                ) : (
+                  <DropdownMenuItem disabled className="text-gray-500">
+                    No maps available
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
 
         {/* Items Grid - Scrollable Container */}
@@ -506,91 +558,102 @@ export function ItemListModal({
           )}
         </div>
 
-        {/* Pagination Controls - Footer */}
-        {totalPages > 1 && (
-          <div className="flex justify-center items-center gap-2 mt-6 pt-4 border-t border-gray-200 dark:border-gray-700 flex-shrink-0">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handlePreviousPage}
-              disabled={currentPage === 1}
-              className="flex items-center gap-1"
-            >
-              <ChevronLeft className="w-4 h-4" />
-              Previous
-            </Button>
+        <div className="flex flex-row justify-between items-center gap-4 mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 flex-shrink-0">
+          {/* Results Summary */}
+          <span className="text-sm text-gray-600 dark:text-gray-400">
+            Showing {startIndex + 1}-{Math.min(endIndex, totalItems)} of{" "}
+            {totalItems} items
+          </span>
 
-            <div className="flex gap-1">
+          {/* Pagination Controls - Footer */}
+
+          {totalPages > 1 && (
+            <div className="flex justify-center items-center gap-2 ">
               <Button
-                key={1}
-                variant={currentPage === 1 ? "default" : "outline"}
+                variant="outline"
                 size="sm"
-                onClick={() => handlePageChange(1)}
-                className="w-8 h-8 p-0"
+                onClick={handlePreviousPage}
+                disabled={currentPage === 1}
+                className="flex items-center gap-1"
               >
-                1
+                <ChevronLeft className="w-4 h-4" />
+                Previous
               </Button>
 
-              {currentPage > 4 && (
-                <span className="flex items-center px-2 text-gray-500">
-                  ...
-                </span>
-              )}
-
-              {Array.from({ length: totalPages }, (_, i) => {
-                const pageNum = i + 1;
-                if (
-                  pageNum > 1 &&
-                  pageNum < totalPages &&
-                  pageNum >= currentPage - 2 &&
-                  pageNum <= currentPage + 2
-                ) {
-                  return (
-                    <Button
-                      key={pageNum}
-                      variant={currentPage === pageNum ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => handlePageChange(pageNum)}
-                      className="w-8 h-8 p-0"
-                    >
-                      {pageNum}
-                    </Button>
-                  );
-                }
-                return null;
-              })}
-
-              {currentPage < totalPages - 3 && (
-                <span className="flex items-center px-2 text-gray-500">
-                  ...
-                </span>
-              )}
-
-              {totalPages > 1 && (
+              <div className="flex gap-1">
                 <Button
-                  key={totalPages}
-                  variant={currentPage === totalPages ? "default" : "outline"}
+                  key={1}
+                  variant={currentPage === 1 ? "default" : "outline"}
                   size="sm"
-                  onClick={() => handlePageChange(totalPages)}
+                  onClick={() => handlePageChange(1)}
                   className="w-8 h-8 p-0"
                 >
-                  {totalPages}
+                  1
                 </Button>
-              )}
-            </div>
 
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleNextPage}
-              disabled={currentPage === totalPages}
-              className="flex items-center gap-1"
-            >
-              Next
-              <ChevronRight className="w-4 h-4" />
-            </Button>
-          </div>
-        )}
+                {currentPage > 4 && (
+                  <span className="flex items-center px-2 text-gray-500">
+                    ...
+                  </span>
+                )}
+
+                {Array.from({ length: totalPages }, (_, i) => {
+                  const pageNum = i + 1;
+                  if (
+                    pageNum > 1 &&
+                    pageNum < totalPages &&
+                    pageNum >= currentPage - 2 &&
+                    pageNum <= currentPage + 2
+                  ) {
+                    return (
+                      <Button
+                        key={pageNum}
+                        variant={
+                          currentPage === pageNum ? "default" : "outline"
+                        }
+                        size="sm"
+                        onClick={() => handlePageChange(pageNum)}
+                        className="w-8 h-8 p-0"
+                      >
+                        {pageNum}
+                      </Button>
+                    );
+                  }
+                  return null;
+                })}
+
+                {currentPage < totalPages - 3 && (
+                  <span className="flex items-center px-2 text-gray-500">
+                    ...
+                  </span>
+                )}
+
+                {totalPages > 1 && (
+                  <Button
+                    key={totalPages}
+                    variant={currentPage === totalPages ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => handlePageChange(totalPages)}
+                    className="w-8 h-8 p-0"
+                  >
+                    {totalPages}
+                  </Button>
+                )}
+              </div>
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleNextPage}
+                disabled={currentPage === totalPages}
+                className="flex items-center gap-1"
+              >
+                Next
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+            </div>
+          )}
+        </div>
 
         {/* Action Buttons */}
         {bulkSelectionMode && (

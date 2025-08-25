@@ -1,21 +1,21 @@
-'use client'
+"use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { useRouter } from 'next/navigation'
-import { useLocale } from '@/components/providers/locale-provider'
-import { getLocaleCode } from '@/lib/locale-utils'
-import { getTranslations } from '@/lib/translations'
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+import { useLocale } from "@/components/providers/locale-provider";
+import { getLocaleCode } from "@/lib/locale-utils";
+import { getTranslations } from "@/lib/translations";
 
 export default function LocaleHomePage() {
-  const router = useRouter()
-  const { locale } = useLocale()
-  const currentLocaleCode = getLocaleCode(locale)
-  const translations = getTranslations(locale)
+  const router = useRouter();
+  const { locale } = useLocale();
+  const currentLocaleCode = getLocaleCode(locale);
+  const translations = getTranslations(locale);
 
   const handleGoToData = () => {
-    router.push(`/${currentLocaleCode}/data`)
-  }
+    router.push(`/${currentLocaleCode}/data`);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -29,7 +29,7 @@ export default function LocaleHomePage() {
               {translations.home.subtitle}
             </p>
           </CardHeader>
-          <CardContent className="text-center space-y-6">
+          <CardContent className="text-center">
             <p className="text-lg text-gray-600 dark:text-gray-300">
               Explore the vast world of League of Legends with our detailed
               database. Find the perfect build, discover new strategies, and
@@ -99,5 +99,5 @@ export default function LocaleHomePage() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

@@ -132,15 +132,12 @@ export function ItemsSelector({
     onRemove: (slotIndex: number) => void
   ) => {
     return (
-      <div className="space-y-3">
+      <div className="space-y-3 mb-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white py-2">
             Item Build {buildNumber}
           </h3>
           <div className="flex items-center gap-3">
-            <div className="text-sm text-gray-600 dark:text-gray-400">
-              Total: {calculateTotalGold(items).toLocaleString()} gold
-            </div>
             <Button
               variant="outline"
               size="sm"
@@ -254,7 +251,7 @@ export function ItemsSelector({
             Item Builds (6 Items)
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent>
           {/* Item Build 1 */}
           {renderItemBuild(1, selectedItems1, onItemSelect1, onItemRemove1)}
 
