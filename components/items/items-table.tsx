@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
-import { Item } from "@/types";
+import { Item, MapsData } from "@/types";
 import { itemsService } from "@/lib/items-service";
 import { APP_CONFIG } from "@/lib/constants";
 
@@ -19,13 +19,50 @@ interface ItemsTableProps {
   items: Item[];
   isLoading: boolean;
   itemsPerPage: number;
+  mapsData?: MapsData;
 }
 
 export function ItemsTable({
   items,
   isLoading,
   itemsPerPage,
+  mapsData,
 }: ItemsTableProps) {
+  // Helper function to get available maps display using actual map data from API
+  const getAvailableMaps = (maps: Record<string, boolean>): string => {
+    if (!maps || Object.keys(maps).length === 0) return "SR";
+
+    // Get maps where the item is available (true)
+    const availableMapIds = Object.entries(maps)
+      .filter(([_, isAvailable]) => isAvailable)
+      .map(([mapId, _]) => mapId);
+
+    if (availableMapIds.length === 0) return "None";
+    if (availableMapIds.length === 1) {
+      // Use actual map name from API if available
+      if (mapsData?.data[availableMapIds[0]]) {
+        return mapsData.data[availableMapIds[0]].MapName;
+      }
+      return availableMapIds[0];
+    }
+
+    // Show first 2 maps, then count remaining
+    const displayMaps = availableMapIds.slice(0, 2).map((mapId) => {
+      // Use actual map name from API if available
+      if (mapsData?.data[mapId]) {
+        return mapsData.data[mapId].MapName;
+      }
+      return mapId;
+    });
+    const remaining = availableMapIds.length - 2;
+
+    if (remaining > 0) {
+      return `${displayMaps.join(", ")} +${remaining}`;
+    }
+
+    return displayMaps.join(", ");
+  };
+
   const renderLoadingSkeletons = () => {
     const imageSize = APP_CONFIG.CHAMPION_IMAGE_SIZE;
     const imageSizeClass = `w-${imageSize / 4} h-${imageSize / 4}`;
@@ -50,6 +87,9 @@ export function ItemsTable({
         </TableCell>
         <TableCell>
           <Skeleton className="h-6 w-12" />
+        </TableCell>
+        <TableCell>
+          <Skeleton className="h-6 w-16" />
         </TableCell>
         <TableCell>
           <div className="flex gap-2">
@@ -82,6 +122,7 @@ export function ItemsTable({
             <TableHead>Description</TableHead>
             <TableHead className="text-center">Cost</TableHead>
             <TableHead className="text-center">Depth</TableHead>
+            <TableHead className="text-center">Map</TableHead>
             <TableHead>Tags</TableHead>
           </TableRow>
         </TableHeader>
@@ -100,6 +141,7 @@ export function ItemsTable({
             <TableHead>Description</TableHead>
             <TableHead className="text-center">Cost</TableHead>
             <TableHead className="text-center">Depth</TableHead>
+            <TableHead className="text-center">Map</TableHead>
             <TableHead>Tags</TableHead>
           </TableRow>
         </TableHeader>
@@ -120,6 +162,7 @@ export function ItemsTable({
           <TableHead>Description</TableHead>
           <TableHead className="text-center">Cost</TableHead>
           <TableHead className="text-center">Depth</TableHead>
+          <TableHead className="text-center">Map</TableHead>
           <TableHead>Tags</TableHead>
         </TableRow>
       </TableHeader>
@@ -170,17 +213,24 @@ export function ItemsTable({
                 {item.depth || 1}
               </span>
             </TableCell>
+            <TableCell className="text-center">
+              <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
+                {getAvailableMaps(item.maps)}
+              </span>
+            </TableCell>
             <TableCell>
               <div className="flex flex-wrap gap-1">
-                {item.tags.map((tag, tagIndex) => (
-                  <Badge
-                    key={tag || `tag-${tagIndex}`}
-                    variant="outline"
-                    className="text-xs"
-                  >
-                    {tag}
-                  </Badge>
-                ))}
+                {item.tags
+                  .filter((tag) => tag && tag.trim() !== "")
+                  .map((tag, tagIndex) => (
+                    <Badge
+                      key={tag || `tag-${tagIndex}`}
+                      variant="outline"
+                      className="text-xs"
+                    >
+                      {tag}
+                    </Badge>
+                  ))}
               </div>
             </TableCell>
           </TableRow>

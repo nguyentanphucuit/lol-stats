@@ -20,6 +20,7 @@ export const itemsService = {
     limit: number
     q?: string
     tags?: string[]
+    maps?: string[]
     locale?: string
   }) => {
     // Ensure limit doesn't exceed maximum
@@ -35,6 +36,10 @@ export const itemsService = {
 
     if (params.tags && params.tags.length > 0) {
       params.tags.forEach(tag => queryParams.append('tags', tag))
+    }
+
+    if (params.maps && params.maps.length > 0) {
+      params.maps.forEach(map => queryParams.append('maps', map))
     }
 
     if (params.locale) {

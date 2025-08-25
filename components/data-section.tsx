@@ -1,39 +1,43 @@
-'use client'
+"use client";
 
-import { Card, CardContent } from '@/components/ui/card'
-import { DataError } from '@/components/data-error'
-import { DataHeader } from '@/components/data-header'
-import { DataFilters } from '@/components/data-filters'
-import { DataResultsSummary } from '@/components/data-results-summary'
-import { DataPagination } from '@/components/data-pagination'
-import { ChampionsTable } from '@/components/champions/champions-table'
-import { ItemsTable } from '@/components/items/items-table'
-import { RunesTable } from '@/components/runes/runes-table'
-import { SpellsTable } from '@/components/spells/spells-table'
+import { Card, CardContent } from "@/components/ui/card";
+import { DataError } from "@/components/data-error";
+import { DataHeader } from "@/components/data-header";
+import { DataFilters } from "@/components/data-filters";
+import { DataResultsSummary } from "@/components/data-results-summary";
+import { DataPagination } from "@/components/data-pagination";
+import { ChampionsTable } from "@/components/champions/champions-table";
+import { ItemsTable } from "@/components/items/items-table";
+import { RunesTable } from "@/components/runes/runes-table";
+import { SpellsTable } from "@/components/spells/spells-table";
+import { MapsData } from "@/types";
 
 type Section =
-  | 'champions'
-  | 'items'
-  | 'runes'
-  | 'spells'
-  | 'stat-perks'
-  | 'runes-builds'
+  | "champions"
+  | "items"
+  | "runes"
+  | "spells"
+  | "stat-perks"
+  | "runes-builds";
 
 interface DataSectionProps {
-  section: Section
-  data: any
-  tags: string[]
-  isLoading: boolean
-  error: any
-  searchQuery: string
-  selectedTags: string[]
-  onSearchChange: (query: string) => void
-  onTagToggle: (tag: string) => void
-  onClearFilters: () => void
-  currentPage: number
-  totalPages: number
-  onPageChange: (page: number) => void
-  itemsPerPage: number
+  section: Section;
+  data: any;
+  tags: string[];
+  isLoading: boolean;
+  error: any;
+  searchQuery: string;
+  selectedTags: string[];
+  selectedMaps?: string[];
+  onSearchChange: (query: string) => void;
+  onTagToggle: (tag: string) => void;
+  onMapToggle?: (map: string) => void;
+  onClearFilters: () => void;
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+  itemsPerPage: number;
+  mapsData?: MapsData;
 }
 
 export function DataSection({
@@ -44,124 +48,146 @@ export function DataSection({
   error,
   searchQuery,
   selectedTags,
+  selectedMaps = [],
   onSearchChange,
   onTagToggle,
+  onMapToggle,
   onClearFilters,
   currentPage,
   totalPages,
   onPageChange,
   itemsPerPage,
+  mapsData,
 }: DataSectionProps) {
   if (error) {
     const errorMessages = {
-      champions: 'Failed to load champions. Please try again later.',
-      items: 'Failed to load items. Please try again later.',
-      runes: 'Failed to load runes. Please try again later.',
-      spells: 'Failed to load spells. Please try again later.',
-      'stat-perks': 'Failed to load stat perks. Please try again later.',
-      'runes-builds': 'Failed to load rune trees. Please try again later.',
-    }
+      champions: "Failed to load champions. Please try again later.",
+      items: "Failed to load items. Please try again later.",
+      runes: "Failed to load runes. Please try again later.",
+      spells: "Failed to load spells. Please try again later.",
+      "stat-perks": "Failed to load stat perks. Please try again later.",
+      "runes-builds": "Failed to load rune trees. Please try again later.",
+    };
 
-    return <DataError message={errorMessages[section]} title="Error" />
+    return <DataError message={errorMessages[section]} title="Error" />;
   }
 
   const renderHeader = () => {
     const headerData = {
       champions: {
-        title: 'Champions',
-        description: 'Explore the League of Legends champion roster',
+        title: "Champions",
+        description: "Explore the League of Legends champion roster",
       },
       items: {
-        title: 'Items',
-        description: 'Explore the League of Legends item shop',
+        title: "Items",
+        description: "Explore the League of Legends item shop",
       },
       runes: {
-        title: 'Runes',
-        description: 'Customize your build with the rune system',
+        title: "Runes",
+        description: "Customize your build with the rune system",
       },
       spells: {
-        title: 'Spells',
-        description: 'Learn about spells and how to use them',
+        title: "Spells",
+        description: "Learn about spells and how to use them",
       },
-      'stat-perks': {
-        title: 'Stat Perks',
-        description: 'Choose bonus stats to customize your champion',
+      "stat-perks": {
+        title: "Stat Perks",
+        description: "Choose bonus stats to customize your champion",
       },
-      'runes-builds': {
-        title: 'Rune Trees',
+      "runes-builds": {
+        title: "Rune Trees",
         description:
-          'Explore the complete rune tree structure with all slots and runes',
+          "Explore the complete rune tree structure with all slots and runes",
       },
-    }
+    };
 
-    const { title, description } = headerData[section]
-    return <DataHeader title={title} description={description} />
-  }
+    const { title, description } = headerData[section];
+    return <DataHeader title={title} description={description} />;
+  };
 
   const renderFilters = () => {
     const filterData = {
       champions: {
-        searchPlaceholder: 'Search champions...',
-        tagLabel: 'Tags',
-        description: 'Find champions by name or filter by their roles and tags',
+        searchPlaceholder: "Search champions...",
+        tagLabel: "Tags",
+        mapLabel: "Maps",
+        description: "Find champions by name or filter by their roles and tags",
       },
       items: {
-        searchPlaceholder: 'Search items...',
-        tagLabel: 'Tags',
+        searchPlaceholder: "Search items...",
+        tagLabel: "Tags",
+        mapLabel: "Maps",
         description:
-          'Find items by name or filter by their categories and tags',
+          "Find items by name or filter by their categories and tags",
       },
       runes: {
-        searchPlaceholder: 'Search runes...',
-        tagLabel: 'Styles',
-        description: 'Find runes by name or filter by their styles',
+        searchPlaceholder: "Search runes...",
+        tagLabel: "Styles",
+        mapLabel: "Maps",
+        description: "Find runes by name or filter by their styles",
       },
       spells: {
-        searchPlaceholder: 'Search spells...',
-        tagLabel: 'Modes',
-        description: 'Find spells by name or filter by their game modes',
+        searchPlaceholder: "Search spells...",
+        tagLabel: "Modes",
+        mapLabel: "Maps",
+        description: "Find spells by name or filter by their game modes",
       },
-      'stat-perks': {
-        searchPlaceholder: 'Search stat perks...',
-        tagLabel: 'Categories',
-        description: 'Find stat perks by name or filter by their categories',
+      "stat-perks": {
+        searchPlaceholder: "Search stat perks...",
+        tagLabel: "Categories",
+        mapLabel: "Maps",
+        description: "Find stat perks by name or filter by their categories",
       },
-      'runes-builds': {
-        searchPlaceholder: 'Search rune trees...',
-        tagLabel: 'Styles',
+      "runes-builds": {
+        searchPlaceholder: "Search rune trees...",
+        tagLabel: "Styles",
+        mapLabel: "Maps",
         description:
-          'Explore the complete rune tree structure with all slots and runes',
+          "Explore the complete rune tree structure with all slots and runes",
       },
-    }
+    };
 
-    const { searchPlaceholder, tagLabel, description } = filterData[section]
+    const { searchPlaceholder, tagLabel, mapLabel, description } =
+      filterData[section];
+
+    // Get available maps for items section
+    const availableMaps =
+      section === "items" && mapsData
+        ? Object.values(mapsData.data)
+            .map((map) => map.MapName)
+            .filter((mapName) => mapName && mapName.trim() !== "")
+        : undefined;
 
     return (
       <DataFilters
         searchQuery={searchQuery}
         selectedTags={selectedTags}
+        selectedMaps={selectedMaps}
         availableTags={tags}
+        availableMaps={availableMaps}
         onSearchChange={onSearchChange}
         onTagToggle={onTagToggle}
+        onMapToggle={onMapToggle}
         onClearFilters={onClearFilters}
         searchPlaceholder={searchPlaceholder}
         tagLabel={tagLabel}
+        mapLabel={mapLabel}
         description={description}
       />
-    )
-  }
+    );
+  };
 
   const renderResultsSummary = () => {
-    if (!data) return null
+    if (!data) return null;
 
     const itemNames = {
-      champions: 'champions',
-      items: 'items',
-      runes: 'runes',
-      spells: 'spells',
-      'stat-perks': 'stat perks',
-      'runes-builds': 'rune trees',
-    }
+      champions: "champions",
+      items: "items",
+      runes: "runes",
+      spells: "spells",
+      "stat-perks": "stat perks",
+      "runes-builds": "rune trees",
+    };
 
     return (
       <DataResultsSummary
@@ -170,8 +196,8 @@ export function DataSection({
         totalItems={data.total}
         itemName={itemNames[section]}
       />
-    )
-  }
+    );
+  };
 
   const renderTable = () => {
     const items =
@@ -180,60 +206,61 @@ export function DataSection({
       data?.items ||
       data?.runes ||
       data?.spells ||
-      []
+      [];
 
     switch (section) {
-      case 'champions':
+      case "champions":
         return (
           <ChampionsTable
             champions={items}
             isLoading={isLoading}
             itemsPerPage={itemsPerPage}
           />
-        )
-      case 'items':
+        );
+      case "items":
         return (
           <ItemsTable
             items={items}
             isLoading={isLoading}
             itemsPerPage={itemsPerPage}
+            mapsData={mapsData}
           />
-        )
-      case 'runes':
+        );
+      case "runes":
         return (
           <RunesTable
             runes={items}
             isLoading={isLoading}
             runesPerPage={itemsPerPage}
           />
-        )
-      case 'spells':
+        );
+      case "spells":
         return (
           <SpellsTable
             spells={items}
             isLoading={isLoading}
             spellsPerPage={itemsPerPage}
           />
-        )
-      case 'stat-perks':
+        );
+      case "stat-perks":
         return (
           <div className="p-6 text-center text-gray-500">
             Stat perks table component will be implemented here
           </div>
-        )
-      case 'runes-builds':
+        );
+      case "runes-builds":
         return (
           <div className="p-6 text-center text-gray-500">
             Rune trees visualization will be implemented here
           </div>
-        )
+        );
       default:
-        return null
+        return null;
     }
-  }
+  };
 
   const renderPagination = () => {
-    if (!data || totalPages <= 1) return null
+    if (!data || totalPages <= 1) return null;
 
     return (
       <DataPagination
@@ -241,8 +268,8 @@ export function DataSection({
         totalPages={totalPages}
         onPageChange={onPageChange}
       />
-    )
-  }
+    );
+  };
 
   return (
     <>
@@ -254,5 +281,5 @@ export function DataSection({
       </Card>
       {renderPagination()}
     </>
-  )
+  );
 }

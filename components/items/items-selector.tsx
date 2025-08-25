@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useItems } from "@/hooks/useItems";
 import Image from "next/image";
-import { X, Plus } from "lucide-react";
+import { X, Plus, Package } from "lucide-react";
 import { ItemListModal } from "./item-list-modal";
 import {
   Tooltip,
@@ -29,6 +29,8 @@ interface ItemsSelectorProps {
   onItemRemove1: (slotIndex: number) => void;
   onItemSelect2: (item: any, slotIndex: number) => void;
   onItemRemove2: (slotIndex: number) => void;
+  maps?: any; // Add maps data
+  mapsLoading?: boolean; // Add maps loading state
 }
 
 export function ItemsSelector({
@@ -38,11 +40,14 @@ export function ItemsSelector({
   onItemRemove1,
   onItemSelect2,
   onItemRemove2,
+  maps,
+  mapsLoading,
 }: ItemsSelectorProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [showItemList, setShowItemList] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
   const [selectedBuild, setSelectedBuild] = useState<1 | 2>(1);
+  const [bulkSelectionMode, setBulkSelectionMode] = useState(false);
 
   const { items, isLoading } = useItems({
     page: 1,
@@ -53,6 +58,11 @@ export function ItemsSelector({
   const filteredItems = items?.items || [];
 
   const handleItemClick = (item: any, slotIndex: number) => {
+    if (bulkSelectionMode) {
+      // In bulk mode, handle differently
+      return;
+    }
+
     if (selectedBuild === 1) {
       onItemSelect1(item, slotIndex);
     } else {
@@ -65,7 +75,40 @@ export function ItemsSelector({
   const handleSlotClick = (slotIndex: number, build: 1 | 2) => {
     setSelectedSlot(slotIndex);
     setSelectedBuild(build);
+    setBulkSelectionMode(false);
     setShowItemList(true);
+  };
+
+  const handleBulkClick = (build: 1 | 2) => {
+    setSelectedBuild(build);
+    setBulkSelectionMode(true);
+    setShowItemList(true);
+  };
+
+  const handleBulkSave = (
+    selectedItems: { item: any; slotIndex: number }[]
+  ) => {
+    if (selectedBuild === 1) {
+      // Clear existing items first
+      for (let i = 0; i < 6; i++) {
+        onItemRemove1(i);
+      }
+      // Add new items
+      selectedItems.forEach(({ item, slotIndex }) => {
+        onItemSelect1(item, slotIndex);
+      });
+    } else {
+      // Clear existing items first
+      for (let i = 0; i < 6; i++) {
+        onItemRemove2(i);
+      }
+      // Add new items
+      selectedItems.forEach(({ item, slotIndex }) => {
+        onItemSelect2(item, slotIndex);
+      });
+    }
+    setShowItemList(false);
+    setBulkSelectionMode(false);
   };
 
   const getItemSlot = (slotIndex: number, build: 1 | 2) => {
@@ -94,8 +137,19 @@ export function ItemsSelector({
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
             Item Build {buildNumber}
           </h3>
-          <div className="text-sm text-gray-600 dark:text-gray-400">
-            Total: {calculateTotalGold(items).toLocaleString()} gold
+          <div className="flex items-center gap-3">
+            <div className="text-sm text-gray-600 dark:text-gray-400">
+              Total: {calculateTotalGold(items).toLocaleString()} gold
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleBulkClick(buildNumber)}
+              className="flex items-center gap-2"
+            >
+              <Package className="w-4 h-4" />
+              +6 Items
+            </Button>
           </div>
         </div>
 
@@ -213,13 +267,20 @@ export function ItemsSelector({
           {/* Item List Modal */}
           <ItemListModal
             isOpen={showItemList}
-            onClose={() => setShowItemList(false)}
+            onClose={() => {
+              setShowItemList(false);
+              setBulkSelectionMode(false);
+            }}
             onItemSelect={handleItemClick}
             selectedSlot={selectedSlot}
             items={filteredItems}
             isLoading={isLoading}
             searchTerm={searchTerm}
             onSearchChange={setSearchTerm}
+            bulkSelectionMode={bulkSelectionMode}
+            onBulkSave={handleBulkSave}
+            selectedBuild={selectedBuild}
+            mapsData={maps}
           />
         </CardContent>
       </Card>

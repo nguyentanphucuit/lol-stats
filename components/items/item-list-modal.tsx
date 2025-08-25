@@ -3,6 +3,14 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 import Image from "next/image";
 import {
   Search,
@@ -10,6 +18,9 @@ import {
   ArrowUpDown,
   ChevronLeft,
   ChevronRight,
+  Save,
+  AlertCircle,
+  MapPin,
 } from "lucide-react";
 import { useState, useMemo, useEffect } from "react";
 
@@ -19,7 +30,7 @@ interface Item {
   image: string;
   gold: { total: number };
   tags?: string[];
-  depth?: number; // Add depth property for sorting
+  maps?: Record<string, boolean>; // Add maps property
 }
 
 interface ItemListModalProps {
@@ -31,6 +42,10 @@ interface ItemListModalProps {
   isLoading: boolean;
   searchTerm: string;
   onSearchChange: (value: string) => void;
+  bulkSelectionMode?: boolean;
+  onBulkSave?: (items: { item: Item; slotIndex: number }[]) => void;
+  selectedBuild?: 1 | 2;
+  mapsData?: any; // Add maps data for filtering
 }
 
 export function ItemListModal({
@@ -42,14 +57,21 @@ export function ItemListModal({
   isLoading,
   searchTerm,
   onSearchChange,
+  bulkSelectionMode = false,
+  onBulkSave,
+  selectedBuild = 1,
+  mapsData,
 }: ItemListModalProps) {
   const [goldSortDirection, setGoldSortDirection] = useState<
     "none" | "asc" | "desc"
-  >("desc"); // Default to descending order (most expensive first)
-  const [selectedDepth, setSelectedDepth] = useState<number | null>(3); // Default to depth 3
+  >("desc");
+  const [selectedMap, setSelectedMap] = useState<string>("11");
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(50); // Show 50 items per page
+  const [itemsPerPage] = useState(50);
   const [localSearchTerm, setLocalSearchTerm] = useState(searchTerm);
+  const [bulkSelectedItems, setBulkSelectedItems] = useState<Map<number, Item>>(
+    new Map()
+  );
 
   // Debounced search effect
   useEffect(() => {
@@ -68,33 +90,32 @@ export function ItemListModal({
     setLocalSearchTerm(searchTerm);
   }, [searchTerm]);
 
-  // Sort function by gold (only sorts the items array, no params changed)
+  // Reset bulk selection when modal opens/closes
+  useEffect(() => {
+    if (!isOpen) {
+      setBulkSelectedItems(new Map());
+    }
+  }, [isOpen]);
+
   const sortedItems = useMemo(() => {
     let filteredItems = items;
 
-    // Filter by selected depth if any
-    if (selectedDepth !== null) {
+    if (selectedMap) {
       filteredItems = items.filter(
-        (item) => (item.depth || 0) === selectedDepth
+        (item) => item.maps && item.maps[selectedMap] === true
       );
     }
 
-    // Sort by gold if enabled
     if (goldSortDirection !== "none") {
       return [...filteredItems].sort((a, b) => {
         const goldA = a.gold?.total || 0;
         const goldB = b.gold?.total || 0;
-
-        if (goldSortDirection === "asc") {
-          return goldA - goldB; // Ascending order by gold cost (cheapest first)
-        } else {
-          return goldB - goldA; // Descending order by gold cost (most expensive first)
-        }
+        return goldSortDirection === "asc" ? goldA - goldB : goldB - goldA;
       });
     }
 
     return filteredItems;
-  }, [items, goldSortDirection, selectedDepth]);
+  }, [items, goldSortDirection, selectedMap]);
 
   // Pagination logic
   const totalItems = sortedItems.length;
@@ -114,9 +135,28 @@ export function ItemListModal({
   };
 
   const handleItemClick = (item: Item) => {
-    if (selectedSlot !== null) {
+    if (bulkSelectionMode) {
+      for (let i = 0; i < 6; i++) {
+        if (!bulkSelectedItems.has(i)) {
+          setBulkSelectedItems((prev) => {
+            const newMap = new Map(prev);
+            newMap.set(i, item);
+            return newMap;
+          });
+          break;
+        }
+      }
+    } else if (selectedSlot !== null) {
       onItemSelect(item, selectedSlot);
     }
+  };
+
+  const handleBulkItemRemove = (slotIndex: number) => {
+    setBulkSelectedItems((prev) => {
+      const newMap = new Map(prev);
+      newMap.delete(slotIndex);
+      return newMap;
+    });
   };
 
   const handleGoldSort = (direction: "none" | "asc" | "desc") => {
@@ -124,14 +164,14 @@ export function ItemListModal({
     resetToFirstPage();
   };
 
-  const handleDepthFilter = (depth: number | null) => {
-    setSelectedDepth(selectedDepth === depth ? null : depth);
+  const handleMapFilter = (mapId: string) => {
+    setSelectedMap(selectedMap === mapId ? "" : mapId);
     resetToFirstPage();
   };
 
   const clearAllFilters = () => {
-    setGoldSortDirection("desc"); // Reset to default instead of "none"
-    setSelectedDepth(3); // Reset to default instead of null
+    setGoldSortDirection("desc");
+    setSelectedMap("11");
     resetToFirstPage();
   };
 
@@ -151,20 +191,149 @@ export function ItemListModal({
     }
   };
 
-  // Early return must come AFTER all hooks
+  const handleBulkSave = () => {
+    if (bulkSelectedItems.size === 6 && onBulkSave) {
+      const itemsArray = Array.from(bulkSelectedItems.entries()).map(
+        ([slotIndex, item]) => ({
+          item,
+          slotIndex,
+        })
+      );
+      onBulkSave(itemsArray);
+    }
+  };
+
+  const handleCancel = () => {
+    if (bulkSelectionMode) {
+      setBulkSelectedItems(new Map());
+    }
+    onClose();
+  };
+
+  const handleBackdropClick = (e: React.MouseEvent) => {
+    // Only close if clicking the backdrop, not the modal content
+    if (e.target === e.currentTarget) {
+      handleCancel();
+    }
+  };
+
+  const isAllSlotsFilled = bulkSelectedItems.size === 6;
+  const totalGold = Array.from(bulkSelectedItems.values()).reduce(
+    (total, item) => total + item.gold.total,
+    0
+  );
+
+  const getMapName = (mapId: string) => {
+    if (mapsData?.data && mapsData.data[mapId]) {
+      return mapsData.data[mapId].MapName || mapId;
+    }
+    return mapId;
+  };
+
+  const getAvailableMaps = (): [string, { MapName: string }][] => {
+    if (mapsData?.data) {
+      return Object.entries(mapsData.data).map(([mapId, mapInfo]) => [
+        mapId,
+        { MapName: (mapInfo as any)?.MapName || mapId },
+      ]);
+    }
+    return [];
+  };
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+      onClick={handleBackdropClick}
+    >
       <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-4xl w-full max-h-[90vh] flex flex-col">
         <div className="flex items-center justify-between mb-4 flex-shrink-0">
           <h3 className="text-lg font-semibold">
-            Select {getSlotLabel(selectedSlot!)}
+            {bulkSelectionMode
+              ? `Select 6 Items for Build ${selectedBuild}`
+              : `Select ${getSlotLabel(selectedSlot!)}`}
           </h3>
-          <Button variant="ghost" size="sm" onClick={onClose}>
+          <Button variant="ghost" size="sm" onClick={handleCancel}>
             <X className="w-4 h-4" />
           </Button>
         </div>
+
+        {/* Bulk Selection Preview */}
+        {bulkSelectionMode && (
+          <div className="mb-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg flex-shrink-0">
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="font-medium">
+                Selected Items ({bulkSelectedItems.size}/6)
+              </h4>
+              {!isAllSlotsFilled && (
+                <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 text-sm">
+                  <AlertCircle className="w-4 h-4" />
+                  You must select exactly 6 items to save the build
+                </div>
+              )}
+
+              <div className="text-sm text-gray-600 dark:text-gray-400">
+                Total: {totalGold.toLocaleString()} gold
+              </div>
+            </div>
+
+            <div className="grid grid-cols-6 gap-2">
+              {Array.from({ length: 6 }).map((_, index) => {
+                const item = bulkSelectedItems.get(index);
+                const slotLabels = ["1st", "2nd", "3rd", "4th", "5th", "6th"];
+
+                return (
+                  <div key={index} className="flex flex-col items-center gap-1">
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                      {slotLabels[index]}
+                    </div>
+                    <div
+                      className={`w-12 h-12 border-2 rounded-lg p-1 flex items-center justify-center ${
+                        item
+                          ? "border-green-500 bg-green-50 dark:bg-green-900/20"
+                          : "border-dashed border-gray-300 dark:border-gray-600"
+                      }`}
+                    >
+                      {item ? (
+                        <div className="relative">
+                          <Image
+                            src={item.image}
+                            alt={item.name}
+                            width={32}
+                            height={32}
+                            className="rounded object-cover"
+                            onError={(e) => {
+                              const target =
+                                e.currentTarget as HTMLImageElement;
+                              target.style.display = "none";
+                              const parent = target.parentElement;
+                              if (parent) {
+                                parent.innerHTML = `<span class="text-gray-500 dark:text-gray-400 font-medium text-xs">${item.name.charAt(0)}</span>`;
+                              }
+                            }}
+                          />
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-4 w-4 p-0 bg-red-100 hover:bg-red-200 dark:hover:bg-red-900/20 absolute -top-1 -right-1"
+                            onClick={() => handleBulkItemRemove(index)}
+                          >
+                            <X className="w-3 h-3 text-red-500" />
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="w-6 h-6 flex items-center justify-center">
+                          <div className="w-4 h-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded"></div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Search and Sort Controls */}
         <div className="flex gap-3 mb-4 flex-shrink-0">
@@ -208,53 +377,43 @@ export function ItemListModal({
           </div>
         </div>
 
-        {/* Depth Filter Buttons */}
-        <div className="flex gap-2 mb-4 flex-shrink-0">
-          <Button
-            variant={selectedDepth === null ? "default" : "outline"}
-            size="sm"
-            onClick={() => handleDepthFilter(null)}
-            className="whitespace-nowrap"
-          >
-            All Depth
-          </Button>
-          <Button
-            variant={selectedDepth === 1 ? "default" : "outline"}
-            size="sm"
-            onClick={() => handleDepthFilter(1)}
-            className="whitespace-nowrap"
-          >
-            Depth 1
-          </Button>
-          <Button
-            variant={selectedDepth === 2 ? "default" : "outline"}
-            size="sm"
-            onClick={() => handleDepthFilter(2)}
-            className="whitespace-nowrap"
-          >
-            Depth 2
-          </Button>
-          <Button
-            variant={selectedDepth === 3 ? "default" : "outline"}
-            size="sm"
-            onClick={() => handleDepthFilter(3)}
-            className="whitespace-nowrap"
-          >
-            Depth 3
-          </Button>
-          {(selectedDepth !== null || goldSortDirection !== "none") && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={clearAllFilters}
-              className="mb-4 flex-shrink-0"
-            >
-              Clear All Filters
-            </Button>
-          )}
+        {/* Map Filter Dropdown */}
+        <div className="flex gap-3 mb-4 flex-shrink-0">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="flex items-center gap-2">
+                <MapPin className="w-4 h-4" />
+                {selectedMap ? getMapName(selectedMap) : "All Maps"}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56 max-h-80 overflow-y-auto">
+              <DropdownMenuLabel>Filter by Map</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => handleMapFilter("")}>
+                All Maps
+              </DropdownMenuItem>
+              {getAvailableMaps().length > 0 ? (
+                getAvailableMaps().map(([mapId, mapInfo]) => (
+                  <DropdownMenuItem
+                    key={mapId}
+                    onClick={() => handleMapFilter(mapId)}
+                    className={
+                      selectedMap === mapId
+                        ? "bg-blue-50 dark:bg-blue-900/20"
+                        : ""
+                    }
+                  >
+                    {(mapInfo as { MapName: string })?.MapName || mapId}
+                  </DropdownMenuItem>
+                ))
+              ) : (
+                <DropdownMenuItem disabled className="text-gray-500">
+                  No maps available
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
-
-        {/* Clear All Filters Button */}
 
         {/* Results Summary */}
         <div className="flex items-center justify-between mb-4 flex-shrink-0 text-sm text-gray-600 dark:text-gray-400">
@@ -277,13 +436,28 @@ export function ItemListModal({
               <p className="mt-2 text-gray-600">Loading items...</p>
             </div>
           ) : (
-            <>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                {paginatedItems.map((item: Item, itemIndex: number) => (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+              {paginatedItems.map((item: Item, itemIndex: number) => {
+                const isSelected =
+                  bulkSelectionMode &&
+                  Array.from(bulkSelectedItems.values()).some(
+                    (selectedItem) => selectedItem.id === item.id
+                  );
+                const selectedSlot = bulkSelectionMode
+                  ? Array.from(bulkSelectedItems.entries()).find(
+                      ([_, selectedItem]) => selectedItem.id === item.id
+                    )?.[0]
+                  : null;
+
+                return (
                   <div
                     key={`item-${item.id || itemIndex}-slot-${selectedSlot}`}
-                    className="border rounded-lg p-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                    onClick={() => handleItemClick(item)}
+                    className={`border rounded-lg p-3 transition-colors ${
+                      isSelected
+                        ? "bg-green-50 dark:bg-green-900/20 border-green-500 cursor-not-allowed"
+                        : "cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700"
+                    }`}
+                    onClick={() => !isSelected && handleItemClick(item)}
                   >
                     <div className="flex items-center gap-2">
                       <div className="w-8 h-8 relative flex-shrink-0">
@@ -302,104 +476,138 @@ export function ItemListModal({
                             }
                           }}
                         />
+                        {isSelected && (
+                          <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
+                            <span className="text-white text-xs font-bold">
+                              ✓
+                            </span>
+                          </div>
+                        )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                        <p
+                          className={`text-sm font-medium truncate ${
+                            isSelected
+                              ? "text-green-700 dark:text-green-300"
+                              : "text-gray-900 dark:text-white"
+                          }`}
+                        >
                           {item.name}
                         </p>
                         <p className="text-xs text-gray-500 dark:text-gray-400">
                           {item.gold.total.toLocaleString()} gold
                         </p>
-                        {item.depth !== undefined && (
-                          <p className="text-xs text-blue-600 dark:text-blue-400">
-                            Depth: {item.depth}
-                          </p>
-                        )}
                       </div>
                     </div>
-                    {item.tags && item.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mt-2">
-                        {item.tags
-                          .slice(0, 2)
-                          .map((tag: string, tagIndex: number) => (
-                            <Badge
-                              key={`${item.id || itemIndex}-tag-${tagIndex}`}
-                              variant="outline"
-                              className="text-xs"
-                            >
-                              {tag}
-                            </Badge>
-                          ))}
-                        {item.tags.length > 2 && (
-                          <Badge variant="outline" className="text-xs">
-                            +{item.tags.length - 2}
-                          </Badge>
-                        )}
-                      </div>
-                    )}
                   </div>
-                ))}
-              </div>
-
-              {/* Pagination Controls */}
-              {totalPages > 1 && (
-                <div className="flex justify-center items-center gap-2 mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handlePreviousPage}
-                    disabled={currentPage === 1}
-                    className="flex items-center gap-1"
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                    Previous
-                  </Button>
-
-                  {/* Page Numbers */}
-                  <div className="flex gap-1">
-                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                      let pageNum;
-                      if (totalPages <= 5) {
-                        pageNum = i + 1;
-                      } else if (currentPage <= 3) {
-                        pageNum = i + 1;
-                      } else if (currentPage >= totalPages - 2) {
-                        pageNum = totalPages - 4 + i;
-                      } else {
-                        pageNum = currentPage - 2 + i;
-                      }
-
-                      return (
-                        <Button
-                          key={pageNum}
-                          variant={
-                            currentPage === pageNum ? "default" : "outline"
-                          }
-                          size="sm"
-                          onClick={() => handlePageChange(pageNum)}
-                          className="w-8 h-8 p-0"
-                        >
-                          {pageNum}
-                        </Button>
-                      );
-                    })}
-                  </div>
-
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleNextPage}
-                    disabled={currentPage === totalPages}
-                    className="flex items-center gap-1"
-                  >
-                    Next
-                    <ChevronRight className="w-4 h-4" />
-                  </Button>
-                </div>
-              )}
-            </>
+                );
+              })}
+            </div>
           )}
         </div>
+
+        {/* Pagination Controls - Footer */}
+        {totalPages > 1 && (
+          <div className="flex justify-center items-center gap-2 mt-6 pt-4 border-t border-gray-200 dark:border-gray-700 flex-shrink-0">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handlePreviousPage}
+              disabled={currentPage === 1}
+              className="flex items-center gap-1"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              Previous
+            </Button>
+
+            <div className="flex gap-1">
+              <Button
+                key={1}
+                variant={currentPage === 1 ? "default" : "outline"}
+                size="sm"
+                onClick={() => handlePageChange(1)}
+                className="w-8 h-8 p-0"
+              >
+                1
+              </Button>
+
+              {currentPage > 4 && (
+                <span className="flex items-center px-2 text-gray-500">
+                  ...
+                </span>
+              )}
+
+              {Array.from({ length: totalPages }, (_, i) => {
+                const pageNum = i + 1;
+                if (
+                  pageNum > 1 &&
+                  pageNum < totalPages &&
+                  pageNum >= currentPage - 2 &&
+                  pageNum <= currentPage + 2
+                ) {
+                  return (
+                    <Button
+                      key={pageNum}
+                      variant={currentPage === pageNum ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => handlePageChange(pageNum)}
+                      className="w-8 h-8 p-0"
+                    >
+                      {pageNum}
+                    </Button>
+                  );
+                }
+                return null;
+              })}
+
+              {currentPage < totalPages - 3 && (
+                <span className="flex items-center px-2 text-gray-500">
+                  ...
+                </span>
+              )}
+
+              {totalPages > 1 && (
+                <Button
+                  key={totalPages}
+                  variant={currentPage === totalPages ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => handlePageChange(totalPages)}
+                  className="w-8 h-8 p-0"
+                >
+                  {totalPages}
+                </Button>
+              )}
+            </div>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleNextPage}
+              disabled={currentPage === totalPages}
+              className="flex items-center gap-1"
+            >
+              Next
+              <ChevronRight className="w-4 h-4" />
+            </Button>
+          </div>
+        )}
+
+        {/* Action Buttons */}
+        {bulkSelectionMode && (
+          <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200 dark:border-gray-700 flex-shrink-0">
+            <Button variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleBulkSave}
+              disabled={!isAllSlotsFilled}
+              className="flex items-center gap-2"
+            >
+              <Save className="w-4 h-4" />
+              Save Items
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -25,6 +25,7 @@ import { useChampions } from "@/hooks/useChampions";
 import { useRuneTrees } from "@/hooks/useRuneTrees";
 import { useSpells } from "@/hooks/useSpells";
 import { useStatPerks } from "@/hooks/useStatPerks";
+import { useMaps } from "@/hooks/useMaps";
 import { getLocaleCode } from "@/lib/locale-utils";
 import { spellsService } from "@/lib/spells-service";
 import { ArrowLeft } from "lucide-react";
@@ -72,6 +73,8 @@ export default function RuneBuilderPage() {
     limit: 200,
     q: "",
   });
+
+  const { maps, isLoading: mapsLoading } = useMaps();
 
   // Effects
   useEffect(() => {
@@ -495,6 +498,8 @@ export default function RuneBuilderPage() {
                 onItemRemove1={handleItemRemove}
                 onItemSelect2={handleItemSelect2}
                 onItemRemove2={handleItemRemove2}
+                maps={maps || []}
+                mapsLoading={mapsLoading}
               />
             </div>
           </div>

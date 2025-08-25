@@ -17,6 +17,7 @@ export async function GET(request: NextRequest) {
     )
     const searchQuery = searchParams.get('q') || ''
     const tags = searchParams.getAll('tags')
+    const maps = searchParams.getAll('maps')
     const locale = searchParams.get('locale') || DEFAULT_LOCALE
 
     // Fetch items data from DDragon API with specified locale
@@ -28,31 +29,35 @@ export async function GET(request: NextRequest) {
 
     const data = await response.json()
 
-    // Get the first item for structure reference
-    const firstItem = Object.values(data.data)[0] as any
+    const items = Object.values(data.data).map((item: any, index: number) => {
 
-    const items = Object.values(data.data).map((item: any) => {
       // Convert relative image path to full URL
       let imageUrl: string
 
       // Use the DDragon base URL directly to construct the image URL
       imageUrl = `${LEAGUE_CONFIG.DDRAGON_BASE_URL}/${LEAGUE_CONFIG.PATCH}/img/item/${item.image.full}`
 
-      return {
-        id: item.id,
+      // Check if item.id exists, if not, try alternative fields
+      const itemId = item.id || item.key || item.itemId || `item_${index}`
+      
+      const transformedItem = {
+        id: itemId,
         name: item.name,
         description: item.description,
         plaintext: item.plaintext,
         image: imageUrl,
         gold: item.gold,
-        tags: item.tags || [],
+        tags: (item.tags || []).filter((tag: string) => tag && tag.trim() !== ''),
         stats: item.stats || {},
         depth: item.depth || 1,
+        maps: item.maps || {},
         from: item.from || [],
         into: item.into || [],
         createdAt: new Date(),
         updatedAt: new Date(),
       }
+
+      return transformedItem
     })
 
     // Filter items based on search query
@@ -73,12 +78,21 @@ export async function GET(request: NextRequest) {
       )
     }
 
+    // Filter by maps
+    if (maps.length > 0) {
+      filteredItems = filteredItems.filter(item =>
+        maps.some(mapId => item.maps[mapId] === true)
+      )
+    }
+
     // Calculate pagination
     const total = filteredItems.length
     const totalPages = Math.ceil(total / limit)
     const startIndex = (page - 1) * limit
     const endIndex = startIndex + limit
     const paginatedItems = filteredItems.slice(startIndex, endIndex)
+
+
 
     return NextResponse.json({
       items: paginatedItems,

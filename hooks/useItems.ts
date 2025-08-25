@@ -8,19 +8,21 @@ interface UseItemsParams {
   limit: number
   q?: string
   tags?: string[]
+  maps?: string[]
 }
 
 export function useItems(params: UseItemsParams) {
   const { locale } = useLocale()
 
   const itemsQuery = useQuery({
-    queryKey: ['items', locale, params.q, params.tags, params.page],
+    queryKey: ['items', locale, params.q, params.tags, params.maps, params.page],
     queryFn: async () => {
       return itemsService.getItems({
         page: params.page,
         limit: params.limit,
         q: params.q,
         tags: params.tags,
+        maps: params.maps,
         locale,
       })
     },

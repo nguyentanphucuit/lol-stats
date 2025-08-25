@@ -7,6 +7,7 @@ import { APP_CONFIG } from '@/lib/constants'
 export interface ChampionsParams {
   q: string
   tags: string[]
+  maps: string[]
   page: number
   limit: number
 }
@@ -21,6 +22,7 @@ export function useParams() {
     () => ({
       q: searchParams.get('q') || '',
       tags: searchParams.getAll('tags'),
+      maps: searchParams.getAll('maps'),
       page: parseInt(searchParams.get('page') || '1'),
       limit: parseInt(
         searchParams.get('limit') || APP_CONFIG.ITEMS_PER_PAGE.toString()
@@ -49,6 +51,12 @@ export function useParams() {
         updates.tags.forEach(tag => newParams.append('tags', tag))
       }
 
+      // Update maps
+      if (updates.maps !== undefined) {
+        newParams.delete('maps')
+        updates.maps.forEach(map => newParams.append('maps', map))
+      }
+
       // Update page (reset to 1 when search/filter changes)
       if (updates.page !== undefined) {
         newParams.set('page', updates.page.toString())
@@ -60,7 +68,7 @@ export function useParams() {
       }
 
       // Reset page to 1 when search or filters change
-      if (updates.q !== undefined || updates.tags !== undefined) {
+      if (updates.q !== undefined || updates.tags !== undefined || updates.maps !== undefined) {
         newParams.set('page', '1')
       }
 
@@ -86,6 +94,13 @@ export function useParams() {
     [updateParams]
   )
 
+  const updateMaps = useCallback(
+    (maps: string[]) => {
+      updateParams({ maps })
+    },
+    [updateParams]
+  )
+
   const updatePage = useCallback(
     (page: number) => {
       updateParams({ page })
@@ -94,7 +109,7 @@ export function useParams() {
   )
 
   const clearFilters = useCallback(() => {
-    updateParams({ q: '', tags: [], page: 1 })
+    updateParams({ q: '', tags: [], maps: [], page: 1 })
   }, [updateParams])
 
   const toggleTag = useCallback(
@@ -107,13 +122,25 @@ export function useParams() {
     [params.tags, updateParams]
   )
 
+  const toggleMap = useCallback(
+    (map: string) => {
+      const newMaps = params.maps.includes(map)
+        ? params.maps.filter(m => m !== map)
+        : [...params.maps, map]
+      updateParams({ maps: newMaps })
+    },
+    [params.maps, updateParams]
+  )
+
   return {
     params,
     updateSearch,
     updateTags,
+    updateMaps,
     updatePage,
     clearFilters,
     toggleTag,
+    toggleMap,
     updateParams,
   }
 }
