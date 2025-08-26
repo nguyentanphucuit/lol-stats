@@ -7,13 +7,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-export interface GameMode {
-  id: string;
-  name: string;
-  description: string;
-  icon: string;
-  isActive?: boolean;
-}
+import type { GameMode } from "@/types";
 
 interface ModeSelectorProps {
   selectedMode: GameMode | null;

@@ -1,26 +1,6 @@
-export interface RuneTree {
-  id: number;
-  name: string;
-  key: string;
-  icon: string;
-  slots: Array<{
-    name: string;
-    runes: Array<{
-      id: number;
-      name: string;
-      icon: string;
-      shortDesc: string;
-    }>;
-  }>;
-}
+import type { RuneTree, SelectedRune, SelectedShard } from '@/types';
 
-export interface SelectedRune {
-  id: number;
-  name: string;
-  icon: string;
-  slotNumber: number;
-  style: string;
-}
+export type { RuneTree, SelectedRune, SelectedShard };
 
 export const TREE_COLORS = {
   8000: "border-yellow-500", // Chuẩn Xác (Precision)
@@ -33,11 +13,3 @@ export const TREE_COLORS = {
 export const getTreeColor = (treeId: number): string => {
   return TREE_COLORS[treeId as keyof typeof TREE_COLORS] || "border-gray-500";
 };
-
-export interface SelectedShard {
-  id: number;
-  name: string;
-  icon: string;
-  slotIndex: number;
-  category: string;
-}

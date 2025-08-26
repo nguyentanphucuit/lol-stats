@@ -264,4 +264,45 @@ export interface MapsData {
   data: Record<string, Map>
 }
 
+// Game Mode interface
+export interface GameMode {
+  id: string
+  name: string
+  description: string
+  icon: string
+  isActive?: boolean
+}
+
+// Selected types for build components
+export interface SelectedRune {
+  id: number
+  name: string
+  icon: string
+  slotNumber: number
+  style: string
+}
+
+export interface SelectedShard {
+  id: number
+  name: string
+  icon: string
+  slotIndex: number
+  category: string
+}
+
+export interface SelectedItem {
+  id: string
+  name: string
+  icon: string
+  gold: number
+  slotIndex: number
+}
+
+export interface SelectedSpell {
+  id: string
+  name: string
+  icon: string
+  slotIndex: number
+}
+
 

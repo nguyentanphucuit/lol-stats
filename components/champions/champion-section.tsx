@@ -4,13 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 import { Plus } from "lucide-react";
 
-export interface Champion {
-  id: number;
-  name: string;
-  title: string;
-  image: string;
-  tags?: string[];
-}
+import type { Champion } from "@/types";
 
 interface ChampionSectionProps {
   selectedChampion: Champion | null;

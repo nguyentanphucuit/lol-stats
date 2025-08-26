@@ -4,11 +4,15 @@ import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 import { X, Check, Save } from "lucide-react";
 import { runesService } from "@/lib/runes-service";
-import type { GameMode } from "@/components/game-modes/mode-selector";
-import type { Champion } from "@/components/champions/champion-section";
-import type { RuneTree, SelectedRune, SelectedShard } from "./types";
-import type { SelectedItem } from "@/components/items/items-selector";
-import type { SelectedSpell } from "@/components/spells/spells-selector";
+import type {
+  GameMode,
+  Champion,
+  RuneTree,
+  SelectedRune,
+  SelectedShard,
+  SelectedItem,
+  SelectedSpell,
+} from "@/types";
 
 interface SaveBuildModalProps {
   isOpen: boolean;

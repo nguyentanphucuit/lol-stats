@@ -2,8 +2,8 @@
 export const ENV_CONFIG = {
   // League of Legends API
   LEAGUE_PATCH: process.env.NEXT_PUBLIC_LEAGUE_PATCH || '15.16.1',
-  DDRAION_BASE_URL:
-    process.env.NEXT_PUBLIC_DDRAION_BASE_URL ||
+  DDRAGON_BASE_URL:
+    process.env.NEXT_PUBLIC_DDRAGON_BASE_URL ||
     'https://ddragon.leagueoflegends.com/cdn',
 
   // Application settings

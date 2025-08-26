@@ -35,7 +35,7 @@ import Link from "next/link";
 import {
   Plus,
   Trash2,
-  Eye,
+  Edit,
   Filter,
   Search,
   X,
@@ -1014,7 +1014,7 @@ export default function RunesBuildsPage() {
                           <TableCell>
                             <div className="flex items-center gap-2">
                               <Button variant="outline" size="sm">
-                                <Eye className="w-4 h-4" />
+                                <Edit className="w-4 h-4" />
                               </Button>
                               <Button
                                 variant="outline"

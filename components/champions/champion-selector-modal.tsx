@@ -4,11 +4,11 @@ import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import { Plus, Search, X, AlertCircle } from "lucide-react";
 import { useRuneBuildsByMode } from "@/hooks/useRuneBuilds";
-import type { Champion } from "./champion-section";
+import type { Champion } from "@/types";
 
 interface ChampionSelectorModalProps {
   showChampionSelector: boolean;
-  champions: any;
+  champions: Champion[];
   championsLoading: boolean;
   onChampionSelect: (champion: Champion) => void;
   onClose: () => void;
@@ -53,7 +53,7 @@ export function ChampionSelectorModal({
 
   // Filter champions based on search query
   const filteredChampions =
-    champions?.champions?.filter(
+    champions?.filter(
       (champion: Champion) =>
         champion.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         champion.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -197,7 +197,7 @@ export function ChampionSelectorModal({
               <div className="flex items-center gap-2">
                 <span className="font-medium">Total Champions:</span>
                 <span className="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-xs">
-                  {champions?.champions?.length || 0}
+                  {champions?.length || 0}
                 </span>
               </div>
               {selectedMode && (

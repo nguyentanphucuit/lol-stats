@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useItems } from "@/hooks/useItems";
+import { useItemsQuery } from "@/hooks/useBuildQueries";
 import Image from "next/image";
 import { X, Plus, Package } from "lucide-react";
 import { ItemListModal } from "./item-list-modal";
@@ -14,13 +14,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-export interface SelectedItem {
-  id: string;
-  name: string;
-  icon: string;
-  gold: number;
-  slotIndex: number;
-}
+import type { SelectedItem } from "@/types";
 
 interface ItemsSelectorProps {
   selectedItems1: SelectedItem[];
@@ -49,13 +43,9 @@ export function ItemsSelector({
   const [selectedBuild, setSelectedBuild] = useState<1 | 2>(1);
   const [bulkSelectionMode, setBulkSelectionMode] = useState(false);
 
-  const { items, isLoading } = useItems({
-    page: 1,
-    limit: 1000,
-    q: searchTerm,
-  });
+  const { data: itemsData, isLoading } = useItemsQuery(searchTerm);
 
-  const filteredItems = items?.items || [];
+  const filteredItems = itemsData?.items || [];
 
   const handleItemClick = (item: any, slotIndex: number) => {
     if (bulkSelectionMode) {

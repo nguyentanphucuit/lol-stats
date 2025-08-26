@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useSpells } from "@/hooks/useSpells";
+import { useSpellsQuery } from "@/hooks/useBuildQueries";
 import { spellsService } from "@/lib/spells-service";
 import Image from "next/image";
 import { X, Plus } from "lucide-react";
@@ -15,12 +15,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-export interface SelectedSpell {
-  id: string;
-  name: string;
-  icon: string;
-  slotIndex: number;
-}
+import type { SelectedSpell } from "@/types";
 
 interface SpellsSelectorProps {
   selectedSpells: SelectedSpell[];
@@ -37,13 +32,9 @@ export function SpellsSelector({
   const [showSpellList, setShowSpellList] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
 
-  const { spells, isLoading } = useSpells({
-    page: 1,
-    limit: 200,
-    q: searchTerm,
-  });
+  const { data: spellsData, isLoading } = useSpellsQuery();
 
-  const filteredSpells = spells?.spells || [];
+  const filteredSpells = spellsData?.spells || [];
 
   const handleSpellClick = (spell: any, slotIndex: number) => {
     // Only proceed if spell has required properties
